@@ -1,13 +1,13 @@
-# FacturaYa v2 — Sistema de Facturación
+# FACTS — Sistema de Facturación
 
 Sistema de facturación electrónica con login, 4 roles de usuario (Admin, Vendedor, Contador, Cliente), tienda online, punto de venta y PostgreSQL.
 
 ## Inicio rápido
 
 Cuentas de prueba:
-- Admin: `admin@facturaya.com` / `admin123`
-- Vendedor: `maria@facturaya.com` / `maria123`
-- Contador: `jorge@facturaya.com` / `jorge123`
+- Admin: `admin@facts.com` / `admin123`
+- Vendedor: `maria@facts.com` / `maria123`
+- Contador: `jorge@facts.com` / `jorge123`
 - Cliente: `ana@empresa.com` / `ana123`
 
 ## Qué hace cada rol
@@ -22,9 +22,9 @@ Cuentas de prueba:
 ### 1. Base de datos
 
 ```bash
-psql -U postgres -c "CREATE DATABASE facturaya;"
-psql -U postgres -d facturaya -f database/01_schema.sql
-psql -U postgres -d facturaya -f database/02_seed.sql
+psql -U postgres -c "CREATE DATABASE facts;"
+psql -U postgres -d facts -f database/01_schema.sql
+psql -U postgres -d facts -f database/02_seed.sql
 ```
 
 ### 2. Backend
