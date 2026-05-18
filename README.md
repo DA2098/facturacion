@@ -8,7 +8,7 @@ Cuentas de prueba:
 - Admin: `admin@factsdollar.com` / `administrador`
 - Vendedor: `maria@factsdollar.com` / `vendedor`
 - Contador: `jorge@factsdollar.com` / `contador`
-- Cliente: `ana@empresa.com` / (elige tu contraseña)
+- Cliente: `ana@factsdollar.com` / (elige tu contraseña)
 
 ## Qué hace cada rol
 
