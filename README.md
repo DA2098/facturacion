@@ -5,10 +5,10 @@ Sistema de facturación electrónica con login, 4 roles de usuario (Admin, Vende
 ## Inicio rápido
 
 Cuentas de prueba:
-- Admin: `admin@facts.com` / `admin123`
-- Vendedor: `maria@facts.com` / `maria123`
-- Contador: `jorge@facts.com` / `jorge123`
-- Cliente: `ana@empresa.com` / `ana123`
+- Admin: `admin@factsdollar.com` / `administrador`
+- Vendedor: `maria@factsdollar.com` / `vendedor`
+- Contador: `jorge@factsdollar.com` / `contador`
+- Cliente: `ana@empresa.com` / (elige tu contraseña)
 
 ## Qué hace cada rol
 
