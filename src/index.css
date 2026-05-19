@@ -647,11 +647,22 @@ body {
 .tienda-filters { @apply flex flex-wrap gap-3 items-center; }
 .tienda-search { max-width: 220px; }
 
-.product-grid { @apply grid grid-cols-2 gap-6; }
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
 
-/* En pantallas muy grandes mostrar 3 columnas para aprovechar el espacio */
+/* En pantallas muy grandes mostrar 3 columnas mínimo */
 @media (min-width: 1400px) {
-  .product-grid { grid-template-columns: repeat(3, 1fr); }
+  .product-grid { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+}
+
+/* Ajuste para que el producto no se compacte cuando el carrito es más ancho */
+@media (min-width: 1200px) {
+  .tienda-cart { width: 480px; }
+  .tienda-products { min-width: 0; }
+  .tienda-layout { gap: 1.5rem; }
 }
 
 .product-card {
