@@ -46,8 +46,6 @@ export default function Tienda() {
     return value.replace(/\D/g, '').slice(0, max);
   }
 
-  const montoRecibidoNum = Number(montoRecibido || 0);
-  const cambioEfectivo = Math.max(0, montoRecibidoNum - total);
 
   useEffect(() => {
     const load = async () => {
@@ -119,6 +117,8 @@ export default function Tienda() {
   const subtotal = carrito.reduce((s, c) => s + c.subtotal, 0);
   const impTotal = carrito.reduce((s, c) => s + c.subtotal * (c.impuesto / 100), 0);
   const total = subtotal + impTotal;
+  const montoRecibidoNum = Number(montoRecibido || 0);
+  const cambioEfectivo = Math.max(0, montoRecibidoNum - total);
 
   async function comprar() {
     if (carrito.length === 0) return;
