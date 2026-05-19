@@ -640,14 +640,19 @@ body {
   background: var(--danger); color: white;
 }
 
-.tienda-layout { @apply flex gap-4; }
-.tienda-products { flex: 1; @apply flex flex-col gap-3; }
-.tienda-cart { width: 300px; }
+.tienda-layout { @apply flex gap-6; }
+.tienda-products { flex: 1 1 auto; @apply flex flex-col gap-4; }
+.tienda-cart { width: 360px; min-width: 280px; }
 
 .tienda-filters { @apply flex flex-wrap gap-3 items-center; }
 .tienda-search { max-width: 220px; }
 
-.product-grid { @apply grid grid-cols-2 gap-3; }
+.product-grid { @apply grid grid-cols-2 gap-4; }
+
+/* En pantallas grandes mostrar 3 columnas para aprovechar el espacio */
+@media (min-width: 1200px) {
+  .product-grid { grid-template-columns: repeat(3, 1fr); }
+}
 
 .product-card {
   background: white;
