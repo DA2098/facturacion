@@ -912,6 +912,19 @@ body {
 
 .card-form-grid { @apply mt-3; }
 
+/* Laptop adjustments: center and limit card width to avoid clipping on typical laptops */
+@media (max-width: 1400px) {
+  .tienda-cart { width: 360px; }
+  .product-grid { gap: 12px; }
+  .product-image { min-height: 200px; }
+  .card-sim-card { padding: 12px; max-width: 280px; margin: 0 auto; }
+  .card-sim-card::after { width: 120px; height: 120px; inset: auto -5% -30% auto; }
+  .card-sim-number { font-size: 1rem; }
+  .card-sim-bottom { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+  .card-sim-bottom > div:last-child { grid-column: auto; }
+  .card-form-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+}
+
 /* Make card form stack when cart is narrow to avoid overlap */
 @media (max-width: 1200px) {
   .card-form-grid { display: flex; flex-direction: column; gap: 0.5rem; }
