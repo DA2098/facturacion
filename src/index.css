@@ -925,19 +925,18 @@ body {
   color: var(--text2);
 }
 
-.card-form-grid { @apply mt-3; }
+/* Always stack card inputs to keep layout clean on narrow sidebars */
+.card-form-grid { @apply mt-3; display: flex; flex-direction: column; gap: 0.5rem; }
 
 /* Laptop adjustments: center and limit card width to avoid clipping on typical laptops */
 @media (max-width: 1400px) {
   .tienda-cart { width: 360px; }
   .product-grid { gap: 12px; }
   .product-image { min-height: 200px; }
-  .card-sim-card { padding: 12px; max-width: 280px; margin: 0 auto; }
-  .card-sim-card::after { width: 120px; height: 120px; inset: auto -5% -30% auto; }
-  .card-sim-number { font-size: 1rem; }
-  .card-sim-bottom { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-  .card-sim-bottom > div:last-child { grid-column: auto; }
-  .card-form-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+  .card-sim-card { padding: 10px; max-width: 220px; margin: 0 auto; }
+  .card-sim-card::after { width: 100px; height: 100px; inset: auto -3% -25% auto; }
+  .card-sim-number { font-size: 0.95rem; }
+  .card-sim-bottom { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
 }
 
 /* Make card form stack when cart is narrow to avoid overlap */
@@ -1005,10 +1004,10 @@ body {
    ═══════════════════════════════════════════════════════════════ */
 
 @media (max-width: 1024px) {
-  .stats-grid { @apply grid-cols-2; }
+  .tienda-cart { width: 320px; min-width: 220px; padding-right: 1.2rem; }
   .dash-row { @apply grid-cols-1; }
   .product-grid { @apply grid-cols-1; }
-  .payment-grid-2 { grid-template-columns: 1fr; }
+  .card-sim-card { padding: 8px; max-width: 220px; margin: 0 auto; }
   .card-sim-bottom { @apply grid-cols-1; }
   .tienda-layout, .venta-layout { @apply flex-col; }
   .tienda-cart, .venta-right { width: 100%; position: static; max-height: none; }
