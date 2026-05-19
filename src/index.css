@@ -23,12 +23,12 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
+    @apply p-5 flex flex-col gap-3;
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text);
-  line-height: 1.5;
+    min-height: 320px;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -42,7 +42,7 @@ body {
 
 .auth-card {
   background: white;
-  border-radius: 12px;
+    @apply p-6;
   width: 100%;
   max-width: 420px;
   overflow: hidden;
@@ -50,13 +50,13 @@ body {
 }
 
 .auth-card-wide {
-  max-width: 580px;
+    .tienda-cart { width: 640px; }
 }
 
 .auth-header {
   @apply text-center py-6 px-6;
-  background: var(--sidebar-bg);
-  color: white;
+    .tienda-cart { width: 560px; }
+    .product-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 }
 
 .auth-logo { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
