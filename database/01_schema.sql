@@ -1,12 +1,12 @@
 -- ═══════════════════════════════════════════════════════════════
 -- 01_SCHEMA.SQL — ESTRUCTURA COMPLETA DE LA BASE DE DATOS
 -- ═══════════════════════════════════════════════════════════════
--- Sistema: FacturaYa v2 - Facturación Electrónica
+-- Sistema: FACTS - Facturación Electrónica
 -- Motor:   PostgreSQL 14+
 -- Tool:    DBeaver / pgAdmin
 --
 -- PASO 1: Crear la base de datos (ejecutar como superuser):
---   CREATE DATABASE facturaya;
+--   CREATE DATABASE facts;
 -- PASO 2: Conectarse a facturaya en DBeaver
 -- PASO 3: Ejecutar este script completo
 -- PASO 4: Ejecutar 02_seed.sql para datos de prueba
