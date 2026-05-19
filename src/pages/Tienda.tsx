@@ -22,6 +22,12 @@ export default function Tienda() {
   const [numeroTarjeta, setNumeroTarjeta] = useState('');
   const [vencimientoTarjeta, setVencimientoTarjeta] = useState('');
   const [cvvTarjeta, setCvvTarjeta] = useState('');
+  const [montoRecibido, setMontoRecibido] = useState('');
+  const [bancoTransferencia, setBancoTransferencia] = useState('');
+  const [referenciaTransferencia, setReferenciaTransferencia] = useState('');
+  const [titularTransferencia, setTitularTransferencia] = useState('');
+  const [plazoCredito, setPlazoCredito] = useState('30');
+  const [observacionCredito, setObservacionCredito] = useState('');
   const [exito, setExito] = useState('');
   const [error, setError] = useState('');
 
@@ -39,6 +45,9 @@ export default function Tienda() {
   function onlyDigits(value: string, max = 4) {
     return value.replace(/\D/g, '').slice(0, max);
   }
+
+  const montoRecibidoNum = Number(montoRecibido || 0);
+  const cambioEfectivo = Math.max(0, montoRecibidoNum - total);
 
   useEffect(() => {
     const load = async () => {
@@ -104,6 +113,32 @@ export default function Tienda() {
 
   async function comprar() {
     if (carrito.length === 0) return;
+    let notasPago = 'Compra desde tienda online';
+
+    if (metodoPago === 'Efectivo') {
+      if (!montoRecibido || Number.isNaN(montoRecibidoNum) || montoRecibidoNum < total) {
+        setError('Ingresa un monto recibido igual o mayor al total.');
+        return;
+      }
+      notasPago = `${notasPago}. Pago en efectivo recibido: USD ${montoRecibidoNum.toFixed(2)}. Vuelto: USD ${cambioEfectivo.toFixed(2)}`;
+    }
+
+    if (metodoPago === 'Transferencia') {
+      if (!bancoTransferencia.trim() || !referenciaTransferencia.trim() || !titularTransferencia.trim()) {
+        setError('Completa banco, titular y referencia de la transferencia.');
+        return;
+      }
+      notasPago = `${notasPago}. Transferencia desde ${bancoTransferencia.trim()} a nombre de ${titularTransferencia.trim()}. Referencia: ${referenciaTransferencia.trim()}`;
+    }
+
+    if (metodoPago === 'Crédito') {
+      if (!plazoCredito.trim()) {
+        setError('Indica el plazo del crédito.');
+        return;
+      }
+      notasPago = `${notasPago}. Crédito a ${plazoCredito.trim()} días${observacionCredito.trim() ? `. Obs: ${observacionCredito.trim()}` : ''}`;
+    }
+
     if (metodoPago === 'Tarjeta') {
       const numeroPlano = numeroTarjeta.replace(/\s/g, '');
       if (!titularTarjeta.trim()) {
@@ -122,19 +157,13 @@ export default function Tienda() {
         setError('Ingresa un CVV válido.');
         return;
       }
+      notasPago = `${notasPago}. Titular: ${titularTarjeta.trim()}. Tarjeta terminada en ${numeroPlano.slice(-4)}`;
     }
-    if (metodoPago === 'Tarjeta' && !titularTarjeta.trim()) {
-      setError('Ingresa el titular de la tarjeta para continuar.');
-      return;
-    }
+
     setError('');
     // asignar un vendedor (el primer admin como default)
     const admins = (await getUsuarios()).filter(u => u.rol === 'admin' || u.rol === 'vendedor');
     const vendedor = admins[0];
-    const notasBase = 'Compra desde tienda online';
-    const notasPago = metodoPago === 'Tarjeta' && titularTarjeta.trim()
-      ? `${notasBase}. Titular: ${titularTarjeta.trim()}. Tarjeta terminada en ${numeroTarjeta.replace(/\s/g, '').slice(-4)}`
-      : notasBase;
     await createFactura({
       cliente_id: user!.id,
       cliente_nombre: user!.nombre,
@@ -150,13 +179,18 @@ export default function Tienda() {
     setNumeroTarjeta('');
     setVencimientoTarjeta('');
     setCvvTarjeta('');
+    setMontoRecibido('');
+    setBancoTransferencia('');
+    setReferenciaTransferencia('');
+    setTitularTransferencia('');
+    setPlazoCredito('30');
+    setObservacionCredito('');
     setProductos((await getProductos()).filter(p => p.activo && p.stock > 0));
     setExito('¡Compra realizada! Tu factura ha sido generada.');
     setTimeout(() => setExito(''), 4000);
   }
 
   const cardDigits = numeroTarjeta.replace(/\s/g, '');
-  const cardLast4 = cardDigits.slice(-4).padStart(4, '•');
   const cardBrand = cardDigits.startsWith('4') ? 'VISA' : cardDigits.startsWith('5') ? 'MASTERCARD' : 'PAYMENT';
 
   return (
@@ -255,8 +289,123 @@ export default function Tienda() {
                     {metodosPago.map(m => <option key={m} value={m}>{m}</option>)}
                   </select>
                 </div>
+                {metodoPago === 'Efectivo' && (
+                  <div className="payment-panel form-col-full">
+                    <div className="payment-panel-head">
+                      <div>
+                        <p className="payment-panel-kicker">Pago en efectivo</p>
+                        <h3>Recibe el importe y calcula el vuelto</h3>
+                      </div>
+                      <ShieldCheck size={18} />
+                    </div>
+                    <div className="form-row payment-grid-2">
+                      <div className="form-col">
+                        <label className="form-label">Monto recibido</label>
+                        <input
+                          value={montoRecibido}
+                          onChange={e => setMontoRecibido(e.target.value)}
+                          className="form-input"
+                          placeholder={`USD ${total.toFixed(2)}`}
+                          inputMode="decimal"
+                        />
+                      </div>
+                      <div className="form-col">
+                        <label className="form-label">Vuelto</label>
+                        <input value={`USD ${cambioEfectivo.toFixed(2)}`} className="form-input" readOnly />
+                      </div>
+                    </div>
+                    <p className="payment-panel-hint">Simula un cobro en caja con validación de monto recibido y vuelto automático.</p>
+                  </div>
+                )}
+
+                {metodoPago === 'Transferencia' && (
+                  <div className="payment-panel form-col-full">
+                    <div className="payment-panel-head">
+                      <div>
+                        <p className="payment-panel-kicker">Transferencia bancaria</p>
+                        <h3>Captura los datos de la operación</h3>
+                      </div>
+                      <Sparkles size={18} />
+                    </div>
+                    <div className="form-row payment-grid-2">
+                      <div className="form-col">
+                        <label className="form-label">Banco de origen</label>
+                        <select value={bancoTransferencia} onChange={e => setBancoTransferencia(e.target.value)} className="form-input">
+                          <option value="">Selecciona banco</option>
+                          <option>Banco de Crédito</option>
+                          <option>BBVA</option>
+                          <option>Interbank</option>
+                          <option>Scotiabank</option>
+                          <option>Yape / Plin</option>
+                        </select>
+                      </div>
+                      <div className="form-col">
+                        <label className="form-label">Titular de la cuenta</label>
+                        <input
+                          value={titularTransferencia}
+                          onChange={e => setTitularTransferencia(e.target.value.toUpperCase())}
+                          className="form-input"
+                          placeholder="Nombre del titular"
+                        />
+                      </div>
+                      <div className="form-col">
+                        <label className="form-label">Nro. de operación</label>
+                        <input
+                          value={referenciaTransferencia}
+                          onChange={e => setReferenciaTransferencia(e.target.value.toUpperCase())}
+                          className="form-input"
+                          placeholder="Referencia / operación"
+                        />
+                      </div>
+                      <div className="form-col">
+                        <label className="form-label">Estado</label>
+                        <input value="Confirmación simulada" className="form-input" readOnly />
+                      </div>
+                    </div>
+                    <p className="payment-panel-hint">Útil para registrar pagos por transferencia y dejar trazabilidad en la factura.</p>
+                  </div>
+                )}
+
+                {metodoPago === 'Crédito' && (
+                  <div className="payment-panel form-col-full">
+                    <div className="payment-panel-head">
+                      <div>
+                        <p className="payment-panel-kicker">Venta a crédito</p>
+                        <h3>Define el plazo y la observación</h3>
+                      </div>
+                      <CreditCard size={18} />
+                    </div>
+                    <div className="form-row payment-grid-2">
+                      <div className="form-col">
+                        <label className="form-label">Plazo en días</label>
+                        <input
+                          value={plazoCredito}
+                          onChange={e => setPlazoCredito(onlyDigits(e.target.value, 3))}
+                          className="form-input"
+                          placeholder="30"
+                          inputMode="numeric"
+                        />
+                      </div>
+                      <div className="form-col">
+                        <label className="form-label">Estado</label>
+                        <input value="Pendiente de cobro" className="form-input" readOnly />
+                      </div>
+                      <div className="form-col form-col-full">
+                        <label className="form-label">Observación</label>
+                        <input
+                          value={observacionCredito}
+                          onChange={e => setObservacionCredito(e.target.value)}
+                          className="form-input"
+                          placeholder="Ej. Crédito aprobado por ventas"
+                        />
+                      </div>
+                    </div>
+                    <p className="payment-panel-hint">Simula una venta financiada y deja el plazo anotado en la factura.</p>
+                  </div>
+                )}
+
                 {metodoPago === 'Tarjeta' && (
-                  <div className="form-col form-col-full">
+                  <div className="payment-panel form-col-full">
                     <div className="card-sim-card">
                       <div className="card-sim-top">
                         <span className="card-sim-chip" />
@@ -279,7 +428,7 @@ export default function Tienda() {
                       </div>
                     </div>
 
-                    <div className="form-row card-form-grid">
+                    <div className="form-row payment-grid-2 card-form-grid">
                       <div className="form-col form-col-full">
                         <label className="form-label">Número de tarjeta</label>
                         <input
