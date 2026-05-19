@@ -667,6 +667,34 @@ body {
 .product-price { @apply text-lg font-bold; color: var(--primary); }
 .tienda-search { max-width: 320px; }
 
+/* Responsive tweaks for laptops and medium screens */
+@media (max-width: 1400px) {
+  .tienda-cart { width: 360px; }
+  .product-grid { gap: 12px; }
+  .product-image { min-height: 200px; }
+  .card-sim-card { padding: 12px; }
+  .card-sim-number { font-size: 1rem; }
+  .card-sim-bottom { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+  .card-sim-bottom > div:last-child { grid-column: span 2; }
+}
+
+@media (max-width: 1200px) {
+  /* On smaller laptops, reduce cart width and allow more room for products */
+  .tienda-cart { width: 320px; min-width: 220px; }
+  .tienda-layout { gap: 12px; }
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
+  .card-sim-card { padding: 10px; }
+  .card-sim-brand { font-size: 12px; }
+  .card-sim-number { font-size: 0.95rem; }
+  .card-sim-label { font-size: 10px; }
+}
+
+@media (max-width: 900px) {
+  /* Stack on small screens */
+  .tienda-layout { @apply flex-col; }
+  .tienda-cart { width: 100%; position: static; max-height: none; }
+}
+
 .product-card {
   background: white;
   border: 1px solid var(--border);
