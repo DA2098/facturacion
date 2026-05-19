@@ -131,6 +131,26 @@ COMMENT ON COLUMN productos.impuesto IS 'Porcentaje de impuesto (IGV/IVA) aplica
 COMMENT ON COLUMN productos.stock IS 'Cantidad disponible en inventario';
 
 -- ═══════════════════════════════════════════════════════════════
+-- TABLA: metodos_pago
+-- ═══════════════════════════════════════════════════════════════
+-- Catálogo de métodos de pago disponibles en el sistema.
+-- Se usa para poblar selectores en ventas y tienda.
+-- ═══════════════════════════════════════════════════════════════
+
+CREATE TABLE metodos_pago (
+    id               UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nombre           VARCHAR(50)     NOT NULL UNIQUE,
+    activo           BOOLEAN         NOT NULL DEFAULT TRUE,
+    orden            SMALLINT        NOT NULL DEFAULT 0,
+    created_at       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+COMMENT ON TABLE metodos_pago IS 'Catálogo de métodos de pago disponibles';
+COMMENT ON COLUMN metodos_pago.nombre IS 'Nombre visible del método de pago';
+COMMENT ON COLUMN metodos_pago.activo IS 'Indica si el método puede usarse en ventas';
+
+-- ═══════════════════════════════════════════════════════════════
 -- TABLA: facturas
 -- ═══════════════════════════════════════════════════════════════
 -- Encabezado de cada factura electrónica.

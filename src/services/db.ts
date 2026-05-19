@@ -319,6 +319,14 @@ export async function getFacturas(filters?: { estado?: string; cliente_id?: stri
   return rows.map(mapFactura);
 }
 
+export async function getMetodosPago(): Promise<string[]> {
+/**
+ * getMetodosPago
+ * GET /api/facturas/metodos-pago — Devuelve los métodos de pago disponibles.
+ */
+  return request<string[]>(`/api/facturas/metodos-pago`);
+}
+
 export async function getFacturaById(id: string): Promise<Factura | undefined> {
 /**
  * getFacturaById

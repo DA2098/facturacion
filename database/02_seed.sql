@@ -99,6 +99,16 @@ INSERT INTO productos (id, codigo, nombre, descripcion, image_url, precio, impue
 ('20000000-0000-0000-0000-000000000010', 'AUD-001', 'Audífonos Sony WH-1000','Audífonos inalámbricos con cancelación',    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80', 950.00, 18, 30,  'Audio');
 
 -- ═══════════════════════════════════════════════════════════════
+-- MÉTODOS DE PAGO
+-- ═══════════════════════════════════════════════════════════════
+
+INSERT INTO metodos_pago (id, nombre, orden) VALUES
+('40000000-0000-0000-0000-000000000001', 'Efectivo', 1),
+('40000000-0000-0000-0000-000000000002', 'Tarjeta', 2),
+('40000000-0000-0000-0000-000000000003', 'Transferencia', 3),
+('40000000-0000-0000-0000-000000000004', 'Crédito', 4);
+
+-- ═══════════════════════════════════════════════════════════════
 -- FACTURAS DE EJEMPLO
 -- ═══════════════════════════════════════════════════════════════
 

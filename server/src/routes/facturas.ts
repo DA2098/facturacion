@@ -27,6 +27,24 @@ router.get('/', async (req, res) => {
   } catch { res.status(500).json({ error: 'Error' }); }
 });
 
+router.get('/metodos-pago', async (_req, res) => {
+  try {
+    const rows = await pool.query(
+      `SELECT nombre
+       FROM metodos_pago
+       WHERE activo = true
+       ORDER BY orden, nombre`
+    );
+    const methods = rows.rows.map((row: any) => row.nombre).filter(Boolean);
+    const catalog = methods.length > 0
+      ? methods
+      : ['Efectivo', 'Tarjeta', 'Transferencia', 'Crédito'];
+    res.json(catalog);
+  } catch {
+    res.status(500).json({ error: 'Error' });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const fac = await pool.query('SELECT * FROM v_facturas_completas WHERE id=$1', [req.params.id]);
