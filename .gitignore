@@ -3,6 +3,5 @@ dist/
 .vscode/
 .env
 .DS_Store
-/public/assets/
 /server/node_modules/
 /server/dist/
