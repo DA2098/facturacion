@@ -660,6 +660,21 @@ body {
 
 .product-image {
   aspect-ratio: 4 / 3;
+
+/* Specific adjustments for common laptop resolution 1366x768 */
+@media (max-width: 1366px) {
+  .tienda-cart { width: 300px; min-width: 240px; padding: 10px; }
+  .tienda-layout { gap: 10px; }
+  .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .product-image { min-height: 180px; }
+  .card-sim-card { max-width: 240px; margin: 0 auto; padding: 10px; }
+  .card-sim-card::after { width: 100px; height: 100px; inset: auto -3% -25% auto; }
+  .card-form-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+  .card-sim-number { font-size: 0.9rem; }
+  .card-sim-bottom { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+  .card-sim-bottom > div:last-child { grid-column: auto; }
+  .tienda-search { max-width: 260px; }
+}
   min-height: 240px;
 }
 
