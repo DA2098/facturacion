@@ -23,7 +23,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const saved = localStorage.getItem('fy_session');
     if (saved) {
-      try { setUser(JSON.parse(saved)); } catch { /* nada */ }
+      try {
+        const parsed = JSON.parse(saved);
+        // Validar estructura mínima del usuario antes de restaurar
+        if (parsed && typeof parsed === 'object' && ('id' in parsed || 'nombre' in parsed)) {
+          setUser(parsed as Usuario);
+        } else {
+          // sesión inválida — limpiar
+          localStorage.removeItem('fy_session');
+          localStorage.removeItem('fy_token');
+        }
+      } catch {
+        localStorage.removeItem('fy_session');
+        localStorage.removeItem('fy_token');
+      }
     }
   }, []);
   // API base (Vite env or fallback)
