@@ -55,5 +55,5 @@ app.get('/api', (_req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 FacturaYa API v2 → http://0.0.0.0:${PORT}/api`);
+  console.log(`🚀 FACTS v2 → http://0.0.0.0:${PORT}/api`);
 });
