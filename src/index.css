@@ -23,7 +23,6 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-    @apply p-5 flex flex-col gap-3;
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   background: var(--bg);
