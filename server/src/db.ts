@@ -7,6 +7,25 @@ import dotenv from 'dotenv';
 dotenv.config();
 // Ejecuta la carga de variables de entorno inmediatamente
 
+function getPgConfig() {
+  const connectionString = process.env.DATABASE_URL;
+
+  if (connectionString) {
+    return {
+      connectionString,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+    };
+  }
+
+  return {
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    database: process.env.DB_NAME || 'facturaya',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'password',
+  };
+}
+
 /*
   DB Pool — configuración y exportación
 
@@ -14,18 +33,7 @@ dotenv.config();
   Cada clave abajo se lee desde `process.env` y tiene un fallback.
 */
 
-const pool = new Pool({
-  // host del servidor PostgreSQL (por defecto 'localhost')
-  host: process.env.DB_HOST || 'localhost',
-  // puerto del servidor PostgreSQL (por defecto 5432)
-  port: parseInt(process.env.DB_PORT || '5432'),
-  // nombre de la base de datos
-  database: process.env.DB_NAME || 'facturaya',
-  // usuario de la base de datos
-  user: process.env.DB_USER || 'postgres',
-  // contraseña (asegúrate de actualizar .env en producción)
-  password: process.env.DB_PASSWORD || 'password',
-});
+const pool = new Pool(getPgConfig());
 
 // Evento 'connect' para confirmar conexión exitosa
 pool.on('connect', () => console.log('✅ PostgreSQL conectado'));
