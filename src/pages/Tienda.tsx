@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.tsx';
-import { getProductos, createFactura, getUsuarios } from '../services/db.ts';
+import { getProductos, createFactura, getUsuarios, getMetodosPago } from '../services/db.ts';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import type { Producto, DetalleFactura } from '../types/index.ts';
 import { ShoppingCart, Plus, Minus, Trash2, CheckCircle, Package, Image as ImageIcon } from 'lucide-react';
@@ -16,15 +16,32 @@ export default function Tienda() {
   const [carrito, setCarrito] = useState<DetalleFactura[]>([]);
   const [q, setQ] = useState('');
   const [catFiltro, setCatFiltro] = useState('Todas');
+  const [metodosPago, setMetodosPago] = useState<string[]>(['Efectivo', 'Tarjeta', 'Transferencia', 'Crédito']);
+  const [metodoPago, setMetodoPago] = useState('Tarjeta');
+  const [titularTarjeta, setTitularTarjeta] = useState('');
   const [exito, setExito] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const load = async () => setProductos((await getProductos()).filter(p => p.activo && p.stock > 0));
+    const load = async () => {
+      const [productosDb, metodosDb] = await Promise.all([getProductos(), getMetodosPago()]);
+      setProductos(productosDb.filter(p => p.activo && p.stock > 0));
+      if (metodosDb.length > 0) {
+        setMetodosPago(metodosDb);
+        if (!metodosDb.includes('Tarjeta')) setMetodoPago(metodosDb[0]);
+      }
+    };
     void load();
   }, []);
 
   useRealtimeRefresh(() => {
-    const load = async () => setProductos((await getProductos()).filter(p => p.activo && p.stock > 0));
+    const load = async () => {
+      const [productosDb, metodosDb] = await Promise.all([getProductos(), getMetodosPago()]);
+      setProductos(productosDb.filter(p => p.activo && p.stock > 0));
+      if (metodosDb.length > 0) {
+        setMetodosPago(metodosDb);
+      }
+    };
     void load();
   }, Boolean(user));
 
@@ -69,20 +86,30 @@ export default function Tienda() {
 
   async function comprar() {
     if (carrito.length === 0) return;
+    if (metodoPago === 'Tarjeta' && !titularTarjeta.trim()) {
+      setError('Ingresa el titular de la tarjeta para continuar.');
+      return;
+    }
+    setError('');
     // asignar un vendedor (el primer admin como default)
     const admins = (await getUsuarios()).filter(u => u.rol === 'admin' || u.rol === 'vendedor');
     const vendedor = admins[0];
+    const notasBase = 'Compra desde tienda online';
+    const notasPago = metodoPago === 'Tarjeta' && titularTarjeta.trim()
+      ? `${notasBase}. Titular de tarjeta: ${titularTarjeta.trim()}`
+      : notasBase;
     await createFactura({
       cliente_id: user!.id,
       cliente_nombre: user!.nombre,
       cliente_ruc: user!.ruc,
       vendedor_id: vendedor?.id || 'sistema',
       vendedor_nombre: vendedor?.nombre || 'Sistema',
-      metodo_pago: 'Tarjeta',
-      notas: 'Compra desde tienda online',
+      metodo_pago: metodoPago,
+      notas: notasPago,
       detalles: carrito,
     });
     setCarrito([]);
+    setTitularTarjeta('');
     setProductos((await getProductos()).filter(p => p.activo && p.stock > 0));
     setExito('¡Compra realizada! Tu factura ha sido generada.');
     setTimeout(() => setExito(''), 4000);
@@ -101,6 +128,7 @@ export default function Tienda() {
       <ProfilePanel title="Mi perfil" subtitle="Actualiza tu foto, nombre y datos personales." />
 
       {exito && <div className="alert alert-ok"><CheckCircle size={16} /> {exito}</div>}
+      {error && <div className="alert alert-error">{error}</div>}
 
       <div className="tienda-layout">
         <div className="tienda-products">
@@ -175,6 +203,25 @@ export default function Tienda() {
                 <div className="cart-total-row"><span>Subtotal</span><span>USD ${subtotal.toFixed(2)}</span></div>
                 <div className="cart-total-row"><span>Impuesto</span><span>USD ${impTotal.toFixed(2)}</span></div>
                 <div className="cart-total-row cart-total-big"><span>Total</span><span>USD ${total.toFixed(2)}</span></div>
+              </div>
+              <div className="form-row">
+                <div className="form-col">
+                  <label className="form-label">Método de pago</label>
+                  <select value={metodoPago} onChange={e => setMetodoPago(e.target.value)} className="form-input">
+                    {metodosPago.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                </div>
+                {metodoPago === 'Tarjeta' && (
+                  <div className="form-col">
+                    <label className="form-label">Titular de la tarjeta</label>
+                    <input
+                      value={titularTarjeta}
+                      onChange={e => setTitularTarjeta(e.target.value)}
+                      className="form-input"
+                      placeholder="Nombre del titular"
+                    />
+                  </div>
+                )}
               </div>
               <button onClick={() => void comprar()} className="btn btn-success btn-full cart-buy-btn">
                 <CheckCircle size={16} /> Finalizar Compra
