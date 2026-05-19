@@ -649,7 +649,7 @@ body {
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1rem;
 }
 
@@ -660,9 +660,16 @@ body {
 
 /* Ajuste para que el producto no se compacte cuando el carrito es más ancho */
 @media (min-width: 1200px) {
-  .tienda-cart { width: 480px; }
+  /* Give the cart more room on desktop/laptop so the payment card fits entirely */
+  .tienda-cart { width: 560px; }
   .tienda-products { min-width: 0; }
   .tienda-layout { gap: 1.5rem; }
+}
+
+/* For common laptop widths (1366px) provide a larger cart so the card doesn't get cut */
+@media (max-width: 1366px) and (min-width: 1000px) {
+  .tienda-cart { width: 520px; }
+  .product-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 }
 
 .product-card {
