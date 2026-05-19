@@ -51,11 +51,16 @@ export default function Tienda() {
 
   useEffect(() => {
     const load = async () => {
-      const [productosDb, metodosDb] = await Promise.all([getProductos(), getMetodosPago()]);
-      setProductos(productosDb.filter(p => p.activo && p.stock > 0));
-      if (metodosDb.length > 0) {
-        setMetodosPago(metodosDb);
-        if (!metodosDb.includes('Tarjeta')) setMetodoPago(metodosDb[0]);
+      try {
+        const [productosDb, metodosDb] = await Promise.all([getProductos(), getMetodosPago()]);
+        setProductos(productosDb.filter(p => p.activo && p.stock > 0));
+        if (metodosDb.length > 0) {
+          setMetodosPago(metodosDb);
+          if (!metodosDb.includes('Tarjeta')) setMetodoPago(metodosDb[0]);
+        }
+      } catch (err: any) {
+        console.error('Error cargando tienda:', err);
+        setError('No se pudieron cargar productos o métodos de pago. Revisa la conexión al servidor.');
       }
     };
     void load();
@@ -63,10 +68,14 @@ export default function Tienda() {
 
   useRealtimeRefresh(() => {
     const load = async () => {
-      const [productosDb, metodosDb] = await Promise.all([getProductos(), getMetodosPago()]);
-      setProductos(productosDb.filter(p => p.activo && p.stock > 0));
-      if (metodosDb.length > 0) {
-        setMetodosPago(metodosDb);
+      try {
+        const [productosDb, metodosDb] = await Promise.all([getProductos(), getMetodosPago()]);
+        setProductos(productosDb.filter(p => p.activo && p.stock > 0));
+        if (metodosDb.length > 0) {
+          setMetodosPago(metodosDb);
+        }
+      } catch (err: any) {
+        console.error('Realtime refresh error:', err);
       }
     };
     void load();
