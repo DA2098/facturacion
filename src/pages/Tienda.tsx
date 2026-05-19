@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext.tsx';
 import { getProductos, createFactura, getUsuarios, getMetodosPago } from '../services/db.ts';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import type { Producto, DetalleFactura } from '../types/index.ts';
-import { ShoppingCart, Plus, Minus, Trash2, CheckCircle, Package, Image as ImageIcon } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Trash2, CheckCircle, Package, Image as ImageIcon, CreditCard, ShieldCheck, Sparkles } from 'lucide-react';
 import ProfilePanel from '../components/ProfilePanel.tsx';
 
 export default function Tienda() {
@@ -19,8 +19,26 @@ export default function Tienda() {
   const [metodosPago, setMetodosPago] = useState<string[]>(['Efectivo', 'Tarjeta', 'Transferencia', 'Crédito']);
   const [metodoPago, setMetodoPago] = useState('Tarjeta');
   const [titularTarjeta, setTitularTarjeta] = useState('');
+  const [numeroTarjeta, setNumeroTarjeta] = useState('');
+  const [vencimientoTarjeta, setVencimientoTarjeta] = useState('');
+  const [cvvTarjeta, setCvvTarjeta] = useState('');
   const [exito, setExito] = useState('');
   const [error, setError] = useState('');
+
+  function formatCardNumber(value: string) {
+    const digits = value.replace(/\D/g, '').slice(0, 16);
+    return digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+  }
+
+  function formatExpiry(value: string) {
+    const digits = value.replace(/\D/g, '').slice(0, 4);
+    if (digits.length <= 2) return digits;
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  }
+
+  function onlyDigits(value: string, max = 4) {
+    return value.replace(/\D/g, '').slice(0, max);
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -86,6 +104,25 @@ export default function Tienda() {
 
   async function comprar() {
     if (carrito.length === 0) return;
+    if (metodoPago === 'Tarjeta') {
+      const numeroPlano = numeroTarjeta.replace(/\s/g, '');
+      if (!titularTarjeta.trim()) {
+        setError('Ingresa el titular de la tarjeta para continuar.');
+        return;
+      }
+      if (!/^\d{13,16}$/.test(numeroPlano)) {
+        setError('Ingresa un número de tarjeta válido de 13 a 16 dígitos.');
+        return;
+      }
+      if (!/^\d{2}\/\d{2}$/.test(vencimientoTarjeta)) {
+        setError('Ingresa el vencimiento en formato MM/AA.');
+        return;
+      }
+      if (!/^\d{3,4}$/.test(cvvTarjeta)) {
+        setError('Ingresa un CVV válido.');
+        return;
+      }
+    }
     if (metodoPago === 'Tarjeta' && !titularTarjeta.trim()) {
       setError('Ingresa el titular de la tarjeta para continuar.');
       return;
@@ -96,7 +133,7 @@ export default function Tienda() {
     const vendedor = admins[0];
     const notasBase = 'Compra desde tienda online';
     const notasPago = metodoPago === 'Tarjeta' && titularTarjeta.trim()
-      ? `${notasBase}. Titular de tarjeta: ${titularTarjeta.trim()}`
+      ? `${notasBase}. Titular: ${titularTarjeta.trim()}. Tarjeta terminada en ${numeroTarjeta.replace(/\s/g, '').slice(-4)}`
       : notasBase;
     await createFactura({
       cliente_id: user!.id,
@@ -110,10 +147,17 @@ export default function Tienda() {
     });
     setCarrito([]);
     setTitularTarjeta('');
+    setNumeroTarjeta('');
+    setVencimientoTarjeta('');
+    setCvvTarjeta('');
     setProductos((await getProductos()).filter(p => p.activo && p.stock > 0));
     setExito('¡Compra realizada! Tu factura ha sido generada.');
     setTimeout(() => setExito(''), 4000);
   }
+
+  const cardDigits = numeroTarjeta.replace(/\s/g, '');
+  const cardLast4 = cardDigits.slice(-4).padStart(4, '•');
+  const cardBrand = cardDigits.startsWith('4') ? 'VISA' : cardDigits.startsWith('5') ? 'MASTERCARD' : 'PAYMENT';
 
   return (
     <div className="page">
@@ -212,14 +256,74 @@ export default function Tienda() {
                   </select>
                 </div>
                 {metodoPago === 'Tarjeta' && (
-                  <div className="form-col">
-                    <label className="form-label">Titular de la tarjeta</label>
-                    <input
-                      value={titularTarjeta}
-                      onChange={e => setTitularTarjeta(e.target.value)}
-                      className="form-input"
-                      placeholder="Nombre del titular"
-                    />
+                  <div className="form-col form-col-full">
+                    <div className="card-sim-card">
+                      <div className="card-sim-top">
+                        <span className="card-sim-chip" />
+                        <span className="card-sim-brand"><CreditCard size={14} /> {cardBrand}</span>
+                      </div>
+                      <div className="card-sim-number">{cardDigits ? formatCardNumber(numeroTarjeta) : '•••• •••• •••• ••••'}</div>
+                      <div className="card-sim-bottom">
+                        <div>
+                          <p className="card-sim-label">Titular</p>
+                          <p className="card-sim-value">{titularTarjeta.trim() || 'JOSE ARMANDO'}</p>
+                        </div>
+                        <div>
+                          <p className="card-sim-label">Vence</p>
+                          <p className="card-sim-value">{vencimientoTarjeta || 'MM/AA'}</p>
+                        </div>
+                        <div>
+                          <p className="card-sim-label">Estado</p>
+                          <p className="card-sim-value card-sim-state"><ShieldCheck size={14} /> Autorización simulada</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="form-row card-form-grid">
+                      <div className="form-col form-col-full">
+                        <label className="form-label">Número de tarjeta</label>
+                        <input
+                          value={numeroTarjeta}
+                          onChange={e => setNumeroTarjeta(formatCardNumber(e.target.value))}
+                          className="form-input"
+                          placeholder="0000 0000 0000 0000"
+                          inputMode="numeric"
+                          maxLength={19}
+                        />
+                      </div>
+                      <div className="form-col">
+                        <label className="form-label">Titular de la tarjeta</label>
+                        <input
+                          value={titularTarjeta}
+                          onChange={e => setTitularTarjeta(e.target.value.toUpperCase())}
+                          className="form-input"
+                          placeholder="Nombre como aparece en la tarjeta"
+                        />
+                      </div>
+                      <div className="form-col">
+                        <label className="form-label">Vencimiento</label>
+                        <input
+                          value={vencimientoTarjeta}
+                          onChange={e => setVencimientoTarjeta(formatExpiry(e.target.value))}
+                          className="form-input"
+                          placeholder="MM/AA"
+                          inputMode="numeric"
+                          maxLength={5}
+                        />
+                      </div>
+                      <div className="form-col">
+                        <label className="form-label">CVV</label>
+                        <input
+                          value={cvvTarjeta}
+                          onChange={e => setCvvTarjeta(onlyDigits(e.target.value, 4))}
+                          className="form-input"
+                          placeholder="123"
+                          inputMode="numeric"
+                          maxLength={4}
+                        />
+                      </div>
+                    </div>
+                    <p className="card-sim-hint"><Sparkles size={14} /> Pago simulado con validación básica de datos. No se procesa una tarjeta real.</p>
                   </div>
                 )}
               </div>
