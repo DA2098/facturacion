@@ -914,13 +914,13 @@ body {
   .stats-grid { @apply grid-cols-2; }
   .dash-row { @apply grid-cols-1; }
   .product-grid { @apply grid-cols-1; }
-}
   .payment-grid-2 { grid-template-columns: 1fr; }
   .card-sim-bottom { @apply grid-cols-1; }
   .tienda-layout, .venta-layout { @apply flex-col; }
   .tienda-cart, .venta-right { width: 100%; position: static; max-height: none; }
   .tienda-search { max-width: 100%; }
   .card-sim-number { @apply text-lg; }
+}
 
 @media (max-width: 768px) {
   .sidebar { width: 56px; }
@@ -939,8 +939,6 @@ body {
   .filters { @apply flex-col items-stretch; }
   .grafico-info { @apply grid-cols-1; }
   .search-wrap { max-width: 100%; }
-  .venta-layout, .tienda-layout { @apply flex-col; }
-  .venta-right, .tienda-cart { width: 100%; position: static; max-height: none; }
   .tbl-wrap, .tbl-wrap-sm { overflow-x: auto; }
   .metodo-grid { @apply grid-cols-1; }
   .profile-form-grid { grid-template-columns: 1fr; }
