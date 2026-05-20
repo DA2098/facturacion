@@ -54,6 +54,11 @@ app.get('/api', (_req, res) => {
   });
 });
 
+// Root: redirect to API index so visiting the service URL shows useful info
+app.get('/', (_req, res) => {
+  res.redirect('/api');
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 FACTS v2 → http://0.0.0.0:${PORT}/api`);
 });
