@@ -11,9 +11,13 @@ function getPgConfig() {
   const connectionString = process.env.DATABASE_URL;
 
   if (connectionString) {
+    // If connecting to a hosted provider (e.g. Render) or the connection
+    // string requests SSL, enable SSL with relaxed cert verification so the
+    // client can connect from the platform. Allow forcing via FORCE_PG_SSL.
+    const needSsl = connectionString.includes('render.com') || connectionString.includes('sslmode=require') || process.env.FORCE_PG_SSL === 'true';
     return {
       connectionString,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+      ssl: needSsl ? { rejectUnauthorized: false } : undefined,
     };
   }
 
