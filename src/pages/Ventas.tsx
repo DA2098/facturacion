@@ -84,6 +84,7 @@ export default function Ventas() {
       metodo_pago: metodo,
       notas,
       detalles,
+      canal_venta: 'venta',
     });
     setExito('Factura emitida correctamente');
     setDetalles([]); setClienteId(''); setNotas('');

@@ -23,7 +23,9 @@ import usuariosRouter from './routes/usuarios';
 import productosRouter from './routes/productos';
 import facturasRouter from './routes/facturas';
 import dashboardRouter from './routes/dashboard';
+import configRouter from './routes/config';
 import { realtimeStream } from './realtime';
+import { sweepAutopagoFacturas } from './autopago';
 
 dotenv.config();
 const app = express();
@@ -39,7 +41,13 @@ app.use('/api/usuarios',  usuariosRouter);
 app.use('/api/productos', productosRouter);
 app.use('/api/facturas',  facturasRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/config', configRouter);
 app.get('/api/realtime', realtimeStream);
+
+void sweepAutopagoFacturas();
+setInterval(() => {
+  void sweepAutopagoFacturas();
+}, 30000);
 
 app.get('/api', (_req, res) => {
   res.json({

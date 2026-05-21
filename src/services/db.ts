@@ -21,7 +21,7 @@
 // Mantén la separación de responsabilidades: Backend = API y datos;
 // Frontend = UI + cliente HTTP.
 
-import type { Usuario, Producto, Factura, DetalleFactura } from '../types/index.ts';
+import type { Usuario, Producto, Factura, DetalleFactura, AutopagoConfig } from '../types/index.ts';
 
 const API = (import.meta as any).env?.VITE_API_URL || '';
 
@@ -82,6 +82,9 @@ function mapFactura(row: any): Factura {
     estado: row.estado,
     metodo_pago: row.metodo_pago || '',
     notas: row.notas || '',
+    canal_venta: row.canal_venta || 'venta',
+    pago_programado_para: row.pago_programado_para || null,
+    pago_autorizado_at: row.pago_autorizado_at || null,
     detalles: (row.detalles || []).map((d: any) => ({
       id: d.id,
       producto_id: d.producto_id,
@@ -377,6 +380,7 @@ export async function createFactura(data: {
   metodo_pago: string;
   notas: string;
   detalles: DetalleFactura[];
+  canal_venta?: 'venta' | 'tienda';
 }): Promise<Factura | null> {
 /**
  * createFactura
@@ -445,4 +449,23 @@ export async function getStats() {
     anuladas: number;
     pendientes: number;
   }>(`/api/dashboard/stats`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONFIG AUTOPAGO
+// ═══════════════════════════════════════════════════════════════
+
+export async function getAutopagoConfig(): Promise<AutopagoConfig> {
+  return request<AutopagoConfig>(`/api/config/autopago`);
+}
+
+export async function updateAutopagoConfig(data: { activo: boolean; minutos: number }): Promise<AutopagoConfig | null> {
+  try {
+    return await request<AutopagoConfig>(`/api/config/autopago`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  } catch {
+    return null;
+  }
 }

@@ -10,11 +10,13 @@
 import { Router } from 'express';
 import pool from '../db';
 import { emitRealtime } from '../realtime';
+import { getAutopagoConfig, scheduleFacturaAutopago, sweepAutopagoFacturas } from '../autopago';
 
 const router = Router();
 
 router.get('/', async (req, res) => {
   try {
+    await sweepAutopagoFacturas();
     const { estado, cliente_id, vendedor_id } = req.query;
     let q = 'SELECT * FROM v_facturas_completas WHERE 1=1';
     const params: any[] = [];
@@ -47,6 +49,7 @@ router.get('/metodos-pago', async (_req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
+    await sweepAutopagoFacturas();
     const fac = await pool.query('SELECT * FROM v_facturas_completas WHERE id=$1', [req.params.id]);
     if (!fac.rows.length) return res.status(404).json({ error: 'No encontrada' });
     const det = await pool.query(
@@ -61,7 +64,7 @@ router.post('/', async (req, res) => {
   // Operación transaccional: obtenemos un cliente y controlamos BEGIN/COMMIT
   const client = await pool.connect();
   try {
-    const { cliente_id, vendedor_id, metodo_pago, notas, detalles } = req.body;
+    const { cliente_id, vendedor_id, metodo_pago, notas, detalles, canal_venta = 'venta' } = req.body;
     if (!cliente_id || !vendedor_id || !detalles?.length) return res.status(400).json({ error: 'Datos incompletos' });
 
     await client.query('BEGIN');
@@ -75,10 +78,19 @@ router.post('/', async (req, res) => {
     }
 
     const numero = (await client.query('SELECT fn_next_factura_numero() AS num')).rows[0].num;
+    const config = await getAutopagoConfig();
+    const autopagoActivo = canal_venta === 'tienda' && config.activo && config.minutos > 0;
+    const estadoInicial = autopagoActivo ? 'pendiente' : 'emitida';
+    const pagoProgramadoPara = autopagoActivo ? `${config.minutos} minutes` : null;
     const fac = await client.query(
-      `INSERT INTO facturas (numero,cliente_id,vendedor_id,subtotal,impuesto_total,total,estado,metodo_pago,notas)
-       VALUES ($1,$2,$3,$4,$5,$6,'emitida',$7,$8) RETURNING *`,
-      [numero, cliente_id, vendedor_id, subtotal, imp, subtotal+imp, metodo_pago||'Efectivo', notas||'']
+      `INSERT INTO facturas (
+        numero,cliente_id,vendedor_id,subtotal,impuesto_total,total,estado,metodo_pago,notas,canal_venta,pago_programado_para
+       )
+       VALUES (
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
+        CASE WHEN $11 IS NULL THEN NULL ELSE CURRENT_TIMESTAMP + ($11 || ' minutes')::interval END
+       ) RETURNING *`,
+      [numero, cliente_id, vendedor_id, subtotal, imp, subtotal+imp, estadoInicial, metodo_pago||'Efectivo', notas||'', canal_venta, pagoProgramadoPara]
     );
 
     for (const d of detalles) {
@@ -90,6 +102,10 @@ router.post('/', async (req, res) => {
     }
 
     await client.query('COMMIT');
+    if (fac.rows[0].estado === 'pendiente') {
+      const scheduled = await scheduleFacturaAutopago(fac.rows[0].id, config.minutos);
+      if (scheduled) fac.rows[0] = scheduled;
+    }
     emitRealtime({
       type: 'sync',
       entity: 'facturas',
@@ -110,7 +126,14 @@ router.put('/:id', async (req, res) => {
   try {
     const { estado, notas } = req.body;
     const r = await pool.query(
-      'UPDATE facturas SET estado=COALESCE($1,estado), notas=COALESCE($2,notas) WHERE id=$3 RETURNING *',
+      `UPDATE facturas SET
+        estado = COALESCE($1,estado),
+        notas = COALESCE($2,notas),
+        pago_autorizado_at = CASE
+          WHEN $1 = 'pagada' THEN COALESCE(pago_autorizado_at, CURRENT_TIMESTAMP)
+          ELSE pago_autorizado_at
+        END
+       WHERE id=$3 RETURNING *`,
       [estado, notas, req.params.id]
     );
     if (!r.rows.length) return res.status(404).json({ error: 'No encontrada' });

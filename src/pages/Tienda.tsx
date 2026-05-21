@@ -182,6 +182,7 @@ export default function Tienda() {
       metodo_pago: metodoPago,
       notas: notasPago,
       detalles: carrito,
+      canal_venta: 'tienda',
     });
     setCarrito([]);
     setTitularTarjeta('');
@@ -195,7 +196,7 @@ export default function Tienda() {
     setPlazoCredito('30');
     setObservacionCredito('');
     setProductos((await getProductos()).filter(p => p.activo && p.stock > 0));
-    setExito('¡Compra realizada! Tu factura ha sido generada.');
+    setExito('¡Compra realizada! Tu factura quedará pendiente hasta el auto-pago.');
     setTimeout(() => setExito(''), 4000);
   }
 

@@ -60,8 +60,17 @@ export interface Factura {
   estado: 'pendiente' | 'emitida' | 'pagada' | 'anulada';
   metodo_pago: string;
   notas: string;
+  canal_venta: 'venta' | 'tienda';
+  pago_programado_para: string | null;
+  pago_autorizado_at: string | null;
   detalles: DetalleFactura[];
   created_at: string;
+}
+
+export interface AutopagoConfig {
+  activo: boolean;
+  minutos: number;
+  updated_at: string;
 }
 
 // ── Sesión activa ────────────────────────────────────────────

@@ -10,12 +10,14 @@ import type { Factura } from '../types/index.ts';
 import Modal from '../components/Modal.tsx';
 import { Eye, FileText, Printer, Download } from 'lucide-react';
 import ProfilePanel from '../components/ProfilePanel.tsx';
+import { formatAutopagoCountdown } from '../utils/autopago.ts';
 
 export default function MisFacturas() {
   const { user } = useAuth();
   const [facturas, setFacturas] = useState<Factura[]>([]);
   const [viewOpen, setViewOpen] = useState(false);
   const [viewF, setViewF] = useState<Factura | null>(null);
+  const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
     const load = async () => {
@@ -23,6 +25,11 @@ export default function MisFacturas() {
     };
     void load();
   }, [user]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(timer);
+  }, []);
 
   useRealtimeRefresh(() => {
     const load = async () => {
@@ -37,6 +44,14 @@ export default function MisFacturas() {
       setViewF(fac);
       setViewOpen(true);
     }
+  }
+
+  function getAutopagoLabel(f: Factura) {
+    if (f.estado !== 'pendiente' || f.canal_venta !== 'tienda' || !f.pago_programado_para) return '';
+    const remaining = new Date(f.pago_programado_para).getTime() - now;
+    return remaining > 0
+      ? `Auto-pago en ${formatAutopagoCountdown(f.pago_programado_para)}`
+      : 'Auto-pago en proceso';
   }
 
   return (
@@ -56,7 +71,7 @@ export default function MisFacturas() {
       ) : (
         <div className="tbl-wrap">
           <table className="tbl">
-            <thead><tr><th>N° Factura</th><th>Fecha</th><th>Ítems</th><th>Subtotal</th><th>Impuesto</th><th>Total</th><th>Método</th><th>Estado</th><th>Ver</th></tr></thead>
+            <thead><tr><th>N° Factura</th><th>Fecha</th><th>Ítems</th><th>Subtotal</th><th>Impuesto</th><th>Total</th><th>Método</th><th>Estado</th><th>Auto-pago</th><th>Ver</th></tr></thead>
             <tbody>
               {facturas.map(f => (
                 <tr key={f.id}>
@@ -68,6 +83,7 @@ export default function MisFacturas() {
                   <td className="fw-600">S/ {f.total.toFixed(2)}</td>
                   <td><span className="badge badge-cat">{f.metodo_pago}</span></td>
                   <td><span className={`badge badge-${f.estado}`}>{f.estado}</span></td>
+                  <td className="td-desc">{getAutopagoLabel(f)}</td>
                   <td><button onClick={() => void openFactura(f.id)} className="act-btn act-view"><Eye size={14} /></button></td>
                 </tr>
               ))}

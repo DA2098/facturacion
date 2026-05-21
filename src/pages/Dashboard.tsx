@@ -9,6 +9,7 @@ import { getStats, getFacturas } from '../services/db.ts';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import { FileText, Users, Package, DollarSign, TrendingUp, Clock, XCircle, AlertCircle } from 'lucide-react';
 import ProfilePanel from '../components/ProfilePanel.tsx';
+import AutoPagoPanel from '../components/AutoPagoPanel.tsx';
 import type { Factura } from '../types/index.ts';
 
 const emptyStats = {
@@ -75,6 +76,8 @@ export default function Dashboard() {
       </div>
 
       <ProfilePanel title="Tu perfil" subtitle="Edita tu nombre, foto, contraseña y datos básicos desde aquí." />
+
+      <AutoPagoPanel />
 
       <div className="stats-grid">
         {cards.map(c => (

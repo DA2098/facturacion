@@ -10,6 +10,7 @@ import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import type { Factura } from '../types/index.ts';
 import Modal from '../components/Modal.tsx';
 import Confirm from '../components/Confirm.tsx';
+import { formatAutopagoCountdown } from '../utils/autopago.ts';
 
 export default function Facturas() {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ export default function Facturas() {
   const [viewF, setViewF] = useState<Factura | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [delId, setDelId] = useState('');
+  const [now, setNow] = useState(Date.now());
 
   async function load() {
     if (!user) return;
@@ -27,7 +29,19 @@ export default function Facturas() {
     else { setAll(await getFacturas()); }
   }
   useEffect(() => { void load(); }, [user]);
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(timer);
+  }, []);
   useRealtimeRefresh(() => { void load(); }, Boolean(user));
+
+  function getAutopagoLabel(f: Factura) {
+    if (f.estado !== 'pendiente' || f.canal_venta !== 'tienda' || !f.pago_programado_para) return '';
+    const remaining = new Date(f.pago_programado_para).getTime() - now;
+    return remaining > 0
+      ? `Auto-pago en ${formatAutopagoCountdown(f.pago_programado_para)}`
+      : 'Auto-pago en proceso';
+  }
 
   const filtered = all.filter(f => {
     if (filtro !== 'todos' && f.estado !== filtro) return false;
@@ -73,7 +87,7 @@ export default function Facturas() {
       ) : (
         <div className="tbl-wrap">
           <table className="tbl">
-            <thead><tr><th>N° Factura</th><th>Cliente</th><th>Vendedor</th><th>Fecha</th><th>Subtotal</th><th>Imp.</th><th>Total</th><th>Método</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <thead><tr><th>N° Factura</th><th>Cliente</th><th>Vendedor</th><th>Fecha</th><th>Subtotal</th><th>Imp.</th><th>Total</th><th>Método</th><th>Estado</th><th>Auto-pago</th><th>Acciones</th></tr></thead>
             <tbody>
               {filtered.map(f => (
                 <tr key={f.id}>
@@ -86,6 +100,7 @@ export default function Facturas() {
                   <td className="fw-600">S/ {f.total.toFixed(2)}</td>
                   <td><span className="badge badge-cat">{f.metodo_pago}</span></td>
                   <td><span className={`badge badge-${f.estado}`}>{f.estado}</span></td>
+                  <td className="td-desc">{getAutopagoLabel(f)}</td>
                   <td>
                     <div className="act-btns">
                       <button onClick={() => void verDetalle(f)} className="act-btn act-view"><Eye size={14} /></button>
