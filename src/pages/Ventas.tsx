@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
 import { getUsuariosByRol, getProductos, createFactura } from '../services/db.ts';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
+import { subscribeRealtime } from '../services/realtime.ts';
 import type { Usuario, Producto, DetalleFactura } from '../types/index.ts';
 import { Plus, Trash2, ShoppingCart, CheckCircle } from 'lucide-react';
 
@@ -39,6 +40,20 @@ export default function Ventas() {
     };
     void load();
   }, Boolean(user));
+
+  // Asegura que cuando se cree un producto en el admin, lo recarguemos aquí
+  useEffect(() => {
+    if (!user) return;
+    const unsub = subscribeRealtime((event) => {
+      try {
+        if (event.entity === 'productos' && event.action === 'create') {
+          console.debug('[Ventas] producto creado SSE -> recargando productos');
+          void (async () => setProductos((await getProductos()).filter(p => p.activo && p.stock > 0)))();
+        }
+      } catch (e) { console.error('[Ventas] error procesando evento realtime', e); }
+    });
+    return () => unsub();
+  }, [user]);
 
   if (!user) return null;
 
