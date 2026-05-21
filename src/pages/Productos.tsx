@@ -11,7 +11,7 @@ import type { Producto } from '../types/index.ts';
 import Modal from '../components/Modal.tsx';
 import Confirm from '../components/Confirm.tsx';
 
-const empty = { codigo: '', nombre: '', descripcion: '', image_url: '', precio: 0, impuesto: 18, stock: 0, categoria: '', activo: true };
+const empty = { codigo: '', nombre: '', descripcion: '', image_url: '', precio: 0, impuesto: 18, stock: 1, categoria: '', activo: true };
 
 export default function Productos() {
   const { user } = useAuth();
@@ -41,8 +41,12 @@ export default function Productos() {
 
   async function save() {
     if (!form.nombre || !form.codigo || form.precio <= 0) return;
-    if (editId) { await updateProducto(editId, form); }
-    else { await createProducto(form); }
+    if (editId) {
+      await updateProducto(editId, form);
+    } else {
+      const payload = { ...form, stock: form.stock > 0 ? form.stock : 1 };
+      await createProducto(payload as Producto);
+    }
     setModalOpen(false); await load();
   }
 
