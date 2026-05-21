@@ -119,7 +119,7 @@ router.post('/', async (req, res) => {
       payload: fac.rows[0],
     });
     res.status(201).json(fac.rows[0]);
-  } catch (e) {
+  } catch (e: any) {
     await client.query('ROLLBACK');
     console.error('Error creating factura:', e);
     try { console.error('Request body at error:', JSON.stringify(req.body).slice(0, 2000)); } catch {}
