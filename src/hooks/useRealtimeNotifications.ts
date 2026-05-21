@@ -54,6 +54,19 @@ export function useRealtimeNotifications() {
     if (!user) return;
     const unsub = subscribeRealtime((event) => {
       console.debug('[useRealtimeNotifications] event', event, 'user', user?.id, user?.rol);
+      // Si el backend emitió una notificación explícita, procesarla primero
+      if (event.entity === 'notificaciones' && event.action === 'create' && event.payload) {
+        const payload: any = event.payload;
+        if (payload.usuario_id === user.id) {
+          addNotification({
+            id: `${event.entity}-${event.action}-${payload.id}-${Date.now()}`,
+            message: payload.mensaje || payload.message || '',
+            type: 'info',
+            createdAt: payload.created_at || new Date().toISOString(),
+          });
+          return;
+        }
+      }
       const notif = getNotificationForEvent(event, user);
       if (notif) {
         console.debug('[useRealtimeNotifications] adding notification', notif);
