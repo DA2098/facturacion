@@ -11,6 +11,7 @@ import type { Factura } from '../types/index.ts';
 import Modal from '../components/Modal.tsx';
 import Confirm from '../components/Confirm.tsx';
 import { formatAutopagoCountdown } from '../utils/autopago.ts';
+import printFactura from '../utils/printFactura.ts';
 
 export default function Facturas() {
   const { user } = useAuth();
