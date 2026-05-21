@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react';
 import { Camera, Mail, Building2, BadgeAlert, LockKeyhole, UserRound, Phone, MapPinned, Barcode, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
-import { updateUsuario } from '../services/db.ts';
+import { updateUsuario, updateUsuarioWithError } from '../services/db.ts';
 import type { Usuario } from '../types/index.ts';
 
 type ProfilePanelProps = {
@@ -64,8 +64,16 @@ export default function ProfilePanel({
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0, width, height);
       
-      // Convertir a JPEG con compresión
-      setProfileImage(canvas.toDataURL('image/jpeg', 0.8));
+      // Convertir a JPEG con compresión y reducir calidad si es necesario
+      const compress = (quality: number) => canvas.toDataURL('image/jpeg', quality);
+      let dataUrl = compress(0.8);
+      const maxBytes = 400 * 1024; // 400 KB
+      let q = 0.8;
+      while (dataUrl.length > maxBytes && q > 0.2) {
+        q -= 0.15;
+        dataUrl = compress(q);
+      }
+      setProfileImage(dataUrl);
     };
     
     const reader = new FileReader();
@@ -95,13 +103,14 @@ export default function ProfilePanel({
 
     if (profilePassword.trim()) payload.password = profilePassword.trim();
 
-    const updated = await updateUsuario(user.id, payload);
-    if (!updated) {
-      setProfileMsg('No se pudo actualizar el perfil');
+    const resp = await updateUsuarioWithError(user.id, payload);
+    if (resp.error) {
+      setProfileMsg(resp.error);
       setSavingProfile(false);
       return;
     }
 
+    const updated = resp.usuario!;
     updateSessionUser({ ...user, ...updated });
     setProfilePassword('');
     setProfileMsg('Perfil actualizado correctamente');

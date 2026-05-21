@@ -218,6 +218,19 @@ export async function updateUsuario(id: string, data: Partial<Usuario>): Promise
   }
 }
 
+// Variante que devuelve el error para mostrar mensajes detallados en la UI
+export async function updateUsuarioWithError(id: string, data: Partial<Usuario>): Promise<{ usuario?: Usuario; error?: string }> {
+  try {
+    const row = await request<any>(`/api/usuarios/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return { usuario: mapUsuario(row) };
+  } catch (err: any) {
+    return { error: err?.message || 'Error actualizando usuario' };
+  }
+}
+
 export async function deleteUsuario(id: string): Promise<boolean> {
 /**
  * deleteUsuario
