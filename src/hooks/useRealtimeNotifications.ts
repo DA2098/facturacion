@@ -9,34 +9,37 @@ function getNotificationForEvent(event, user) {
   const { type, entity, action, payload } = event;
   // ADMIN
   if (user.rol === 'admin') {
-    if (entity === 'producto' && action === 'create') {
-      return { message: `Has creado el producto "${payload?.nombre || ''}".`, type: 'info' };
+    if (entity === 'productos' && action === 'create') {
+      return { message: `Has creado el producto "${payload?.nombre || payload?.nombre || ''}".`, type: 'info' };
+    }
+    if (entity === 'productos' && action === 'update') {
+      return { message: `Producto actualizado: "${payload?.nombre || ''}".`, type: 'info' };
     }
   }
   // CLIENTE
   if (user.rol === 'cliente') {
-    if (entity === 'factura' && action === 'create' && payload?.cliente_id === user.id) {
+    if (entity === 'facturas' && action === 'create' && payload?.cliente_id === user.id) {
       return { message: 'Se ha emitido una nueva factura.', type: 'info' };
     }
-    if (entity === 'factura' && action === 'update' && payload?.estado === 'pagada' && payload?.cliente_id === user.id) {
+    if (entity === 'facturas' && action === 'update' && payload?.estado === 'pagada' && payload?.cliente_id === user.id) {
       return { message: 'Tu factura ha sido pagada.', type: 'success' };
     }
   }
   // VENDEDOR
   if (user.rol === 'vendedor') {
-    if (entity === 'factura' && action === 'create' && payload?.vendedor_id === user.id) {
+    if (entity === 'facturas' && action === 'create' && payload?.vendedor_id === user.id) {
       return { message: `Has emitido la factura #${payload?.id || ''}.`, type: 'info' };
     }
-    if (entity === 'factura' && action === 'update' && payload?.estado === 'pagada' && payload?.vendedor_id === user.id) {
+    if (entity === 'facturas' && action === 'update' && payload?.estado === 'pagada' && payload?.vendedor_id === user.id) {
       return { message: `Has marcado la factura #${payload?.id || ''} como pagada.`, type: 'success' };
     }
   }
   // CONTADOR
   if (user.rol === 'contador') {
-    if (entity === 'factura' && action === 'create') {
+    if (entity === 'facturas' && action === 'create') {
       return { message: `Se ha emitido una nueva factura para revisión.`, type: 'info' };
     }
-    if (entity === 'factura' && action === 'update' && payload?.estado === 'pagada') {
+    if (entity === 'facturas' && action === 'update' && payload?.estado === 'pagada') {
       return { message: `Factura #${payload?.id || ''} ha sido pagada.`, type: 'success' };
     }
   }
