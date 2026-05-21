@@ -63,6 +63,8 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   // Operación transaccional: obtenemos un cliente y controlamos BEGIN/COMMIT
+  console.log('POST /api/facturas called');
+  console.log('request body preview:', JSON.stringify(req.body).slice(0, 2000));
   const client = await pool.connect();
   try {
     const { cliente_id, vendedor_id, metodo_pago, notas, detalles, canal_venta = 'venta' } = req.body;
@@ -119,8 +121,9 @@ router.post('/', async (req, res) => {
     res.status(201).json(fac.rows[0]);
   } catch (e) {
     await client.query('ROLLBACK');
-    console.error(e);
-    res.status(500).json({ error: 'Error' });
+    console.error('Error creating factura:', e);
+    try { console.error('Request body at error:', JSON.stringify(req.body).slice(0, 2000)); } catch {}
+    res.status(500).json({ error: e?.message || 'Error' });
   } finally { client.release(); }
 });
 
