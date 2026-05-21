@@ -93,7 +93,7 @@ export default function Sidebar() {
           <LogOut size={18} />
           <span className="sidebar-logout-text">Cerrar Sesión</span>
         </button>
-        <Users size={12} style={{ display: 'none' }} />
+        <Users size={12} />
         <span className="sidebar-version">FACTS v2.0.0</span>
       </div>
     </aside>
