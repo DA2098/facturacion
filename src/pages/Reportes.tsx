@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { getStats, getFacturas, getUsuariosByRol } from '../services/db.ts';
-import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
+import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications.ts';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import { BarChart3, DollarSign, TrendingUp, FileText, Users } from 'lucide-react';
 import GraficosGanancias from '../components/GraficosGanancias.tsx';

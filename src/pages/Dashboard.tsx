@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
-import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
+import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications.ts';
 import { getStats, getFacturas } from '../services/db.ts';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import { FileText, Users, Package, DollarSign, TrendingUp, Clock, XCircle, AlertCircle } from 'lucide-react';

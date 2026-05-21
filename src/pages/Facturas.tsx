@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Search, Eye, Trash2, FileText, CheckCircle, XCircle, Printer } from 'lucide-react';
 import { getFacturas, updateFactura, deleteFactura, getFacturasByVendedor, getFacturaById, extendFacturaTiempo } from '../services/db.ts';
-import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
+import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import type { Factura } from '../types/index.ts';
@@ -14,10 +14,12 @@ import Confirm from '../components/Confirm.tsx';
 import { formatAutopagoCountdown } from '../utils/autopago.ts';
 import printFactura from '../utils/printFactura.ts';
 
+
+function Facturas() {
   const { user } = useAuth();
   useRealtimeNotifications();
   const [all, setAll] = useState<Factura[]>([]);
-    const [q, setQ] = useState('');
+  const [q, setQ] = useState('');
   const [filtro, setFiltro] = useState('todos');
   const [viewOpen, setViewOpen] = useState(false);
   const [viewF, setViewF] = useState<Factura | null>(null);
@@ -25,6 +27,7 @@ import printFactura from '../utils/printFactura.ts';
   const [delId, setDelId] = useState('');
   const [now, setNow] = useState(Date.now());
   // Nota: la configuración global de autopago ahora se maneja desde el Dashboard.
+
 
   async function load() {
     if (!user) return;
@@ -40,7 +43,7 @@ import printFactura from '../utils/printFactura.ts';
   }, [user]);
   useRealtimeRefresh(() => { void load(); }, Boolean(user));
 
-  export default Facturas;
+
   function getAutopagoLabel(f: Factura) {
     if (f.estado !== 'pendiente' || f.canal_venta !== 'tienda' || !f.pago_programado_para) return '';
     const remaining = new Date(f.pago_programado_para).getTime() - now;
@@ -57,6 +60,7 @@ import printFactura from '../utils/printFactura.ts';
     }
     return true;
   }).reverse();
+
 
   async function verDetalle(f: Factura) {
     const full = await getFacturaById(f.id);
@@ -179,3 +183,5 @@ import printFactura from '../utils/printFactura.ts';
     </div>
   );
 }
+
+export default Facturas;

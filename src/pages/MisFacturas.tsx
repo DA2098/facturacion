@@ -6,7 +6,8 @@ export default MisFacturas;
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.tsx';
-import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
+import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications.ts';
+import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import { getFacturasByCliente, getFacturaById } from '../services/db.ts';
 import type { Factura } from '../types/index.ts';
 import Modal from '../components/Modal.tsx';
