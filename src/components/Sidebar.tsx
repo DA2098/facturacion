@@ -89,12 +89,12 @@ export default function Sidebar() {
       </nav>
 
       <div className="sidebar-bottom">
-        <button type="button" onClick={logout} className="sidebar-link sidebar-logout">
+        <button type="button" onClick={logout} className="sidebar-link sidebar-logout" title="Cerrar Sesión">
           <LogOut size={18} />
-          <span>Cerrar Sesión</span>
+          <span className="sidebar-logout-text">Cerrar Sesión</span>
         </button>
-        <Users size={12} />
-        <span className="sidebar-version">v2.0.0 — {user.empresa}</span>
+        <Users size={12} style={{ display: 'none' }} />
+        <span className="sidebar-version">FACTS v2.0.0</span>
       </div>
     </aside>
   );
