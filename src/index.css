@@ -270,9 +270,13 @@ body {
 
 /* Allow profile info values (like long emails) to wrap instead of being truncated */
 .profile-info-item span {
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  text-overflow: initial !important;
+  overflow: visible !important;
+  max-width: 100%;
+  display: block;
 }
 
 .page-top { @apply flex items-start justify-between flex-wrap gap-3; }
