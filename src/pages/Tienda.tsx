@@ -173,7 +173,7 @@ export default function Tienda() {
     // asignar un vendedor (el primer admin como default)
     const admins = (await getUsuarios()).filter(u => u.rol === 'admin' || u.rol === 'vendedor');
     const vendedor = admins[0];
-    await createFactura({
+    const created = await createFactura({
       cliente_id: user!.id,
       cliente_nombre: user!.nombre,
       cliente_ruc: user!.ruc,
@@ -184,6 +184,12 @@ export default function Tienda() {
       detalles: carrito,
       canal_venta: 'tienda',
     });
+
+    if (!created) {
+      setError('No se pudo generar la factura. Intenta de nuevo.');
+      return;
+    }
+
     setCarrito([]);
     setTitularTarjeta('');
     setNumeroTarjeta('');
