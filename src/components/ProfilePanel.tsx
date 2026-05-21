@@ -3,9 +3,9 @@
 // ═══════════════════════════════════════════════════════════════
 
 import { useEffect, useState } from 'react';
-import { Camera, Mail, Building2, BadgeAlert, LockKeyhole, UserRound, Phone, MapPinned, Barcode, Trash2 } from 'lucide-react';
+import { Camera, Mail, Building2, BadgeAlert, LockKeyhole, Phone, MapPinned, Barcode, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
-import { updateUsuario, updateUsuarioWithError } from '../services/db.ts';
+import { updateUsuarioWithError } from '../services/db.ts';
 import type { Usuario } from '../types/index.ts';
 
 type ProfilePanelProps = {
@@ -103,7 +103,7 @@ export default function ProfilePanel({
 
     if (profilePassword.trim()) payload.password = profilePassword.trim();
 
-    const resp = await updateUsuarioWithError(user.id, payload);
+    const resp = await updateUsuarioWithError(user!.id, payload);
     if (resp.error) {
       setProfileMsg(resp.error);
       setSavingProfile(false);
