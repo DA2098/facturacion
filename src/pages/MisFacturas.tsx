@@ -74,7 +74,20 @@ export default function MisFacturas() {
       ) : (
         <div className="tbl-wrap">
           <table className="tbl">
-            <thead><tr><th>N° Factura</th><th>Fecha</th><th>Ítems</th><th>Subtotal</th><th>Impuesto</th><th>Total</th><th>Método</th><th>Estado</th><th>Auto-pago</th><th>Ver</th></tr></thead>
+            <thead>
+              <tr>
+                <th>N° Factura</th>
+                <th>Fecha</th>
+                <th>Ítems</th>
+                <th>Subtotal</th>
+                <th>Impuesto</th>
+                <th>Total</th>
+                <th>Método</th>
+                <th>Estado</th>
+                {user?.rol !== 'cliente' && <th>Auto-pago</th>}
+                <th>Ver</th>
+              </tr>
+            </thead>
             <tbody>
               {facturas.map(f => (
                 <tr key={f.id}>
@@ -86,7 +99,7 @@ export default function MisFacturas() {
                   <td className="fw-600">S/ {f.total.toFixed(2)}</td>
                   <td><span className="badge badge-cat">{f.metodo_pago}</span></td>
                   <td><span className={`badge badge-${f.estado}`}>{f.estado}</span></td>
-                  <td className="td-desc">{getAutopagoLabel(f)}</td>
+                  {user?.rol !== 'cliente' && <td className="td-desc">{getAutopagoLabel(f)}</td>}
                   <td><button onClick={() => void openFactura(f.id)} className="act-btn act-view"><Eye size={14} /></button></td>
                 </tr>
               ))}
