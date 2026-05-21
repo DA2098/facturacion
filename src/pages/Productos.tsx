@@ -60,8 +60,8 @@ export default function Productos() {
         alert('El código ya existe en el catálogo — usa otro código.');
         return;
       }
-      const payload = { ...form, stock: form.stock > 0 ? form.stock : 1 };
-      const resp = await createProductoWithError(payload as Omit<Producto, 'id' | 'created_at'>);
+      const payload = { ...form, stock: form.stock > 0 ? form.stock : 1, usuario_id: user?.id };
+      const resp = await createProductoWithError(payload as any);
       if (resp.error) {
         alert(resp.error);
         return;
