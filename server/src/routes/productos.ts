@@ -61,7 +61,6 @@ router.post('/', async (req, res) => {
     try {
       const admins = (await pool.query("SELECT id FROM usuarios WHERE rol='admin' AND activo = true")).rows;
       for (const a of admins) {
-        if (usuario_id && a.id === usuario_id) continue;
         await crearNotificacion({
           usuario_id: a.id,
           tipo: 'producto_agregado',
