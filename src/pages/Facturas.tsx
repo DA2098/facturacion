@@ -30,9 +30,11 @@ export default function Facturas() {
   }
   useEffect(() => { void load(); }, [user]);
   useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 30000);
+    // If admin or vendedor we need a smooth realtime countdown (1s), otherwise coarse refresh
+    const intervalMs = user && (user.rol === 'admin' || user.rol === 'vendedor') ? 1000 : 30000;
+    const timer = setInterval(() => setNow(Date.now()), intervalMs);
     return () => clearInterval(timer);
-  }, []);
+  }, [user]);
   useRealtimeRefresh(() => { void load(); }, Boolean(user));
 
   function getAutopagoLabel(f: Factura) {
@@ -104,6 +106,10 @@ export default function Facturas() {
                   <td>
                     <div className="act-btns">
                       <button onClick={() => void verDetalle(f)} className="act-btn act-view"><Eye size={14} /></button>
+                      {/* Mostrar al cliente como pagada: disponible a admin y vendedor */}
+                      {(user?.rol === 'admin' || user?.rol === 'vendedor') && f.estado !== 'pagada' && (
+                        <button onClick={() => void marcar(f.id, 'pagada')} className="act-btn act-ok" title="Mostrar al cliente como pagada"><CheckCircle size={14} /></button>
+                      )}
                       {!isReadOnly && f.estado === 'emitida' && <button onClick={() => void marcar(f.id, 'pagada')} className="act-btn act-ok"><CheckCircle size={14} /></button>}
                       {!isReadOnly && f.estado !== 'anulada' && <button onClick={() => void marcar(f.id, 'anulada')} className="act-btn act-warn"><XCircle size={14} /></button>}
                       {user?.rol === 'admin' && <button onClick={() => { setDelId(f.id); setConfirmOpen(true); }} className="act-btn act-del"><Trash2 size={14} /></button>}

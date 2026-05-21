@@ -47,6 +47,8 @@ export default function MisFacturas() {
   }
 
   function getAutopagoLabel(f: Factura) {
+    // Clientes no deben ver el contador
+    if (user?.rol === 'cliente') return '';
     if (f.estado !== 'pendiente' || f.canal_venta !== 'tienda' || !f.pago_programado_para) return '';
     const remaining = new Date(f.pago_programado_para).getTime() - now;
     return remaining > 0
