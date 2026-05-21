@@ -53,8 +53,10 @@ export function useRealtimeNotifications() {
   useEffect(() => {
     if (!user) return;
     const unsub = subscribeRealtime((event) => {
+      console.debug('[useRealtimeNotifications] event', event, 'user', user?.id, user?.rol);
       const notif = getNotificationForEvent(event, user);
       if (notif) {
+        console.debug('[useRealtimeNotifications] adding notification', notif);
         addNotification({
           id: `${event.entity}-${event.action}-${event.id}-${Date.now()}`,
           message: notif.message,

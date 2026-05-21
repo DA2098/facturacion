@@ -13,14 +13,19 @@ let source: EventSource | null = null;
 
 function connect() {
   if (source || typeof window === 'undefined') return;
-  source = new EventSource(`${API}/api/realtime`);
+  const url = `${API}/api/realtime`;
+  console.debug('[realtime] connecting to', url);
+  source = new EventSource(url);
 
   source.onmessage = event => {
     try {
       const data = JSON.parse(event.data) as RealtimeEvent;
+      console.debug('[realtime] event received', data);
       for (const listener of listeners) listener(data);
-    } catch {
+    } catch (err) {
       // Ignorar mensajes de keep-alive o payload inválido.
+      // Pero loguear por si hay problemas de parseo
+      console.debug('[realtime] failed to parse event', err);
     }
   };
 

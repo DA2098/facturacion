@@ -11,7 +11,8 @@ export function useRealtimeRefresh(onRefresh: () => void, enabled = true) {
   useEffect(() => {
     if (!enabled) return;
     return subscribeRealtime(() => {
-      handlerRef.current();
+      console.debug('[useRealtimeRefresh] realtime event -> invoking handler');
+      try { handlerRef.current(); } catch (e) { console.error('[useRealtimeRefresh] handler error', e); }
     });
   }, [enabled]);
 }
