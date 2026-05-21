@@ -120,7 +120,7 @@ export default function AutoPagoPanel() {
 
       <div className="box-extra" style={{ marginTop: 12 }}>
         <p className="box-extra-label"><Clock3 size={14} /> Tiempo actual</p>
-        <p className="box-extra-value">{config.activo ? `${config.minutos} min` : 'Suspendido'}</p>
+        <p className="box-extra-value">{config.activo ? `${value} ${displayUnitShort(unit)}` : 'Suspendido'}</p>
 
         <div style={{ marginTop: 8 }}>
           <small>Presets:</small>
