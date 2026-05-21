@@ -63,9 +63,8 @@ export default function AutoPagoPanel() {
     setSaving(true);
     setMsg('');
     try {
-      const map: Record<string, number> = { minutes: 1, hours: 60, days: 1440, weeks: 10080, months: 43200, sixmonths: 43200, years: 525600 };
+      const map: Record<string, number> = { minutes: 1, hours: 60, days: 1440, weeks: 10080, months: 43200, sixmonths: 259200, years: 525600 };
       let minutos = Math.max(0, Math.round(value * (map[unit] || 1)));
-      if (unit === 'sixmonths') minutos = Math.max(0, Math.round(value * 43200));
       const updated = await updateAutopagoConfig({ activo: config.activo, minutos });
       if (!updated) { setMsg('No se pudo guardar la configuración.'); return; }
       setConfig(updated);
