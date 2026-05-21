@@ -1,0 +1,24 @@
+# Node
+node_modules/
+dist/
+
+# Env files
+.env
+server/.env
+.env.local
+
+# Editor
+.vscode/
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+node_modules/
+dist/
+.vscode/
+.env
+.DS_Store
+/server/node_modules/
+/server/dist/
