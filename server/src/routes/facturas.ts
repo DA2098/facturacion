@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
     if (vendedor_id) { q += ` AND vendedor_id = $${i++}`; params.push(vendedor_id); }
     q += ' ORDER BY created_at DESC';
     res.json((await pool.query(q, params)).rows);
-  } catch { res.status(500).json({ error: 'Error' }); }
+  } catch (e: any) { console.error(e); res.status(500).json({ error: e?.message || 'Error' }); }
 });
 
 router.get('/metodos-pago', async (_req, res) => {
@@ -42,8 +42,9 @@ router.get('/metodos-pago', async (_req, res) => {
       ? methods
       : ['Efectivo', 'Tarjeta', 'Transferencia', 'Crédito'];
     res.json(catalog);
-  } catch {
-    res.status(500).json({ error: 'Error' });
+  } catch (e: any) {
+    console.error(e);
+    res.status(500).json({ error: e?.message || 'Error' });
   }
 });
 
@@ -57,7 +58,7 @@ router.get('/:id', async (req, res) => {
        FROM factura_detalles fd JOIN productos p ON fd.producto_id=p.id
        WHERE fd.factura_id=$1`, [req.params.id]);
     res.json({ ...fac.rows[0], detalles: det.rows });
-  } catch { res.status(500).json({ error: 'Error' }); }
+  } catch (e: any) { console.error(e); res.status(500).json({ error: e?.message || 'Error' }); }
 });
 
 router.post('/', async (req, res) => {
