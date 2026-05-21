@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, Package, Image as ImageIcon } from 'lucide-react';
-import { getProductos, createProducto, updateProducto, deleteProducto } from '../services/db.ts';
+import { getProductos, createProducto, createProductoWithError, updateProducto, deleteProducto } from '../services/db.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import type { Producto } from '../types/index.ts';
@@ -33,7 +33,18 @@ export default function Productos() {
     return p.nombre.toLowerCase().includes(s) || p.codigo.toLowerCase().includes(s) || p.categoria.toLowerCase().includes(s);
   });
 
-  function openCreate() { setForm(empty); setEditId(null); setModalOpen(true); }
+  function suggestNextCode(): string {
+    // intenta obtener el mayor código numérico y sugerir el siguiente (formato 001)
+    const nums = all.map(p => {
+      const m = (p.codigo || '').match(/(\d+)$/);
+      return m ? parseInt(m[1], 10) : NaN;
+    }).filter(n => Number.isFinite(n));
+    const max = nums.length ? Math.max(...nums) : 0;
+    const next = (max + 1).toString().padStart(3, '0');
+    return next;
+  }
+
+  function openCreate() { setForm({ ...empty, codigo: suggestNextCode() }); setEditId(null); setModalOpen(true); }
   function openEdit(p: Producto) {
     setForm({ codigo: p.codigo, nombre: p.nombre, descripcion: p.descripcion, image_url: p.image_url, precio: p.precio, impuesto: p.impuesto, stock: p.stock, categoria: p.categoria, activo: p.activo });
     setEditId(p.id); setModalOpen(true);
@@ -44,15 +55,16 @@ export default function Productos() {
     if (editId) {
       await updateProducto(editId, form);
     } else {
-      // Evitar enviar al servidor si el código ya existe (409)
+      // Evitar enviar al servidor si el código ya existe (cliente)
       if (all.some(p => p.codigo === form.codigo)) {
         alert('El código ya existe en el catálogo — usa otro código.');
         return;
       }
       const payload = { ...form, stock: form.stock > 0 ? form.stock : 1 };
-      const created = await createProducto(payload as Producto);
-      if (!created) {
-        alert('Error creando el producto en el servidor. Comprueba la consola o inténtalo de nuevo.');
+      const resp = await createProductoWithError(payload as Omit<Producto, 'id' | 'created_at'>);
+      if (resp.error) {
+        alert(resp.error);
+        return;
       }
     }
     setModalOpen(false); await load();

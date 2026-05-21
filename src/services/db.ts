@@ -288,6 +288,18 @@ export async function createProducto(data: Omit<Producto, 'id' | 'created_at'>):
   }
 }
 
+export async function createProductoWithError(data: Omit<Producto, 'id' | 'created_at'>): Promise<{ producto?: Producto; error?: string }> {
+  try {
+    const row = await request<any>(`/api/productos`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return { producto: mapProducto(row) };
+  } catch (err: any) {
+    return { error: err?.message || 'Error creando producto' };
+  }
+}
+
 export async function updateProducto(id: string, data: Partial<Producto>): Promise<Producto | null> {
 /**
  * updateProducto
