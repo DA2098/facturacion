@@ -1,6 +1,6 @@
 // Lógica de notificaciones centralizada
 // Permite crear notificaciones para cualquier usuario y evento
-import pool from '../db';
+import pool from './db';
 
 export type NotificacionTipo =
   | 'producto_agregado'
