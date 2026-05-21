@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, Package, Image as ImageIcon } from 'lucide-react';
-import { getProductos, createProducto, createProductoWithError, updateProducto, deleteProducto } from '../services/db.ts';
+import { getProductos, createProductoWithError, updateProducto, deleteProducto } from '../services/db.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import type { Producto } from '../types/index.ts';
