@@ -90,8 +90,8 @@ export default function Reportes() {
       </div>
 
       <div className="stats-grid">
-        <div className="stat-card card-blue"><div><p className="stat-label">Ingresos Totales</p><p className="stat-value">S/ {stats.montoTotal.toFixed(2)}</p></div><div className="stat-icon"><DollarSign size={26} /></div></div>
-        <div className="stat-card card-green"><div><p className="stat-label">Impuestos</p><p className="stat-value">S/ {stats.impuestoTotal.toFixed(2)}</p></div><div className="stat-icon"><TrendingUp size={26} /></div></div>
+        <div className="stat-card card-blue"><div><p className="stat-label">Ingresos Totales</p><p className="stat-value">USD {stats.montoTotal.toFixed(2)}</p></div><div className="stat-icon"><DollarSign size={26} /></div></div>
+        <div className="stat-card card-green"><div><p className="stat-label">Impuestos</p><p className="stat-value">USD {stats.impuestoTotal.toFixed(2)}</p></div><div className="stat-icon"><TrendingUp size={26} /></div></div>
         <div className="stat-card card-purple"><div><p className="stat-label">Facturas</p><p className="stat-value">{stats.totalFacturas}</p></div><div className="stat-icon"><FileText size={26} /></div></div>
         <div className="stat-card card-orange"><div><p className="stat-label">Clientes</p><p className="stat-value">{totalClientes}</p></div><div className="stat-icon"><Users size={26} /></div></div>
       </div>
@@ -110,7 +110,7 @@ export default function Reportes() {
                 <thead><tr><th>Vendedor</th><th>Facturas</th><th>Total</th></tr></thead>
                 <tbody>
                   {Object.values(porVendedor).map((v, i) => (
-                    <tr key={i}><td className="fw-600">{v.nombre}</td><td>{v.count}</td><td>S/ {v.total.toFixed(2)}</td></tr>
+                    <tr key={i}><td className="fw-600">{v.nombre}</td><td>{v.count}</td><td>USD {v.total.toFixed(2)}</td></tr>
                   ))}
                 </tbody>
               </table>
@@ -129,7 +129,7 @@ export default function Reportes() {
                 <thead><tr><th>Cliente</th><th>Compras</th><th>Total</th></tr></thead>
                 <tbody>
                   {topClientes.map((c, i) => (
-                    <tr key={i}><td className="fw-600">{c.nombre}</td><td>{c.count}</td><td>S/ {c.total.toFixed(2)}</td></tr>
+                    <tr key={i}><td className="fw-600">{c.nombre}</td><td>{c.count}</td><td>USD {c.total.toFixed(2)}</td></tr>
                   ))}
                 </tbody>
               </table>
@@ -147,9 +147,9 @@ export default function Reportes() {
           ) : (
             <div className="metodo-grid">
               {Object.entries(porMetodo).map(([m, d]) => (
-                <div key={m} className="metodo-card">
+                  <div key={m} className="metodo-card">
                   <p className="metodo-name">{m}</p>
-                  <p className="metodo-total">S/ {d.total.toFixed(2)}</p>
+                  <p className="metodo-total">USD {d.total.toFixed(2)}</p>
                   <p className="metodo-count">{d.count} factura{d.count !== 1 ? 's' : ''}</p>
                 </div>
               ))}

@@ -82,7 +82,7 @@ export default function GraficosGanancias() {
           <Tooltip
             formatter={(value: any) => {
               const num = typeof value === 'number' ? value : parseFloat(value);
-              return isNaN(num) ? 'S/ 0.00' : `S/ ${num.toFixed(2)}`;
+              return isNaN(num) ? 'USD 0.00' : `USD ${num.toFixed(2)}`;
             }}
             contentStyle={{ backgroundColor: '#f0f2f5', border: '1px solid #e2e8f0' }}
           />

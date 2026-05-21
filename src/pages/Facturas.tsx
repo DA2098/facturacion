@@ -100,9 +100,9 @@ export default function Facturas() {
                   <td>{f.cliente_nombre}<br/><span className="td-desc">RUC: {f.cliente_ruc}</span></td>
                   <td>{f.vendedor_nombre}</td>
                   <td>{f.fecha}</td>
-                  <td>S/ {f.subtotal.toFixed(2)}</td>
-                  <td>S/ {f.impuesto_total.toFixed(2)}</td>
-                  <td className="fw-600">S/ {f.total.toFixed(2)}</td>
+                  <td>USD {f.subtotal.toFixed(2)}</td>
+                  <td>USD {f.impuesto_total.toFixed(2)}</td>
+                  <td className="fw-600">USD {f.total.toFixed(2)}</td>
                   <td><span className="badge badge-cat">{f.metodo_pago}</span></td>
                   <td><span className={`badge badge-${f.estado}`}>{f.estado}</span></td>
                   <td className="td-desc">{getAutopagoLabel(f)}</td>
@@ -152,15 +152,15 @@ export default function Facturas() {
                 <thead><tr><th>Código</th><th>Producto</th><th>Cant</th><th>P.Unit</th><th>Imp%</th><th>Subtotal</th></tr></thead>
                 <tbody>
                   {viewF.detalles.map(d => (
-                    <tr key={d.id}><td className="mono">{d.producto_codigo}</td><td>{d.producto_nombre}</td><td>{d.cantidad}</td><td>S/ {d.precio_unitario.toFixed(2)}</td><td>{d.impuesto}%</td><td>S/ {d.subtotal.toFixed(2)}</td></tr>
+                    <tr key={d.id}><td className="mono">{d.producto_codigo}</td><td>{d.producto_nombre}</td><td>{d.cantidad}</td><td>USD {d.precio_unitario.toFixed(2)}</td><td>{d.impuesto}%</td><td>USD {d.subtotal.toFixed(2)}</td></tr>
                   ))}
                 </tbody>
               </table>
             </div>
             <div className="fac-totales">
-              <div className="fac-total-row"><span>Subtotal:</span><span>S/ {viewF.subtotal.toFixed(2)}</span></div>
-              <div className="fac-total-row"><span>Impuesto:</span><span>S/ {viewF.impuesto_total.toFixed(2)}</span></div>
-              <div className="fac-total-row fac-total-big"><span>TOTAL:</span><span>S/ {viewF.total.toFixed(2)}</span></div>
+              <div className="fac-total-row"><span>Subtotal:</span><span>USD {viewF.subtotal.toFixed(2)}</span></div>
+              <div className="fac-total-row"><span>Impuesto:</span><span>USD {viewF.impuesto_total.toFixed(2)}</span></div>
+              <div className="fac-total-row fac-total-big"><span>TOTAL:</span><span>USD {viewF.total.toFixed(2)}</span></div>
             </div>
             {viewF.notas && <div className="fac-notas"><p className="fac-info-label">Notas:</p><p>{viewF.notas}</p></div>}
             <div className="fac-actions">

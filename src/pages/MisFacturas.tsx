@@ -94,9 +94,9 @@ export default function MisFacturas() {
                   <td className="mono fw-600">{f.numero}</td>
                   <td>{f.fecha}</td>
                   <td>{f.detalles.length}</td>
-                  <td>S/ {f.subtotal.toFixed(2)}</td>
-                  <td>S/ {f.impuesto_total.toFixed(2)}</td>
-                  <td className="fw-600">S/ {f.total.toFixed(2)}</td>
+                  <td>USD {f.subtotal.toFixed(2)}</td>
+                  <td>USD {f.impuesto_total.toFixed(2)}</td>
+                  <td className="fw-600">USD {f.total.toFixed(2)}</td>
                   <td><span className="badge badge-cat">{f.metodo_pago}</span></td>
                   <td><span className={`badge badge-${f.estado}`}>{f.estado}</span></td>
                   {user?.rol !== 'cliente' && <td className="td-desc">{getAutopagoLabel(f)}</td>}
@@ -140,9 +140,9 @@ export default function MisFacturas() {
                       <td className="mono">{d.producto_codigo}</td>
                       <td>{d.producto_nombre}</td>
                       <td>{d.cantidad}</td>
-                      <td>S/ {d.precio_unitario.toFixed(2)}</td>
+                      <td>USD {d.precio_unitario.toFixed(2)}</td>
                       <td>{d.impuesto}%</td>
-                      <td>S/ {d.subtotal.toFixed(2)}</td>
+                      <td>USD {d.subtotal.toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -150,9 +150,9 @@ export default function MisFacturas() {
             </div>
 
             <div className="fac-totales">
-              <div className="fac-total-row"><span>Subtotal:</span><span>S/ {viewF.subtotal.toFixed(2)}</span></div>
-              <div className="fac-total-row"><span>Impuesto:</span><span>S/ {viewF.impuesto_total.toFixed(2)}</span></div>
-              <div className="fac-total-row fac-total-big"><span>TOTAL:</span><span>S/ {viewF.total.toFixed(2)}</span></div>
+              <div className="fac-total-row"><span>Subtotal:</span><span>USD {viewF.subtotal.toFixed(2)}</span></div>
+              <div className="fac-total-row"><span>Impuesto:</span><span>USD {viewF.impuesto_total.toFixed(2)}</span></div>
+              <div className="fac-total-row fac-total-big"><span>TOTAL:</span><span>USD {viewF.total.toFixed(2)}</span></div>
             </div>
 
             <div className="fac-actions">

@@ -1,6 +1,6 @@
 import type { Factura } from '../types/index.ts';
 
-function money(v: number) { return `S/ ${v.toFixed(2)}`; }
+function money(v: number) { return `USD ${v.toFixed(2)}`; }
 
 export default function printFactura(f: Factura) {
   if (!f) return;

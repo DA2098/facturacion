@@ -1038,6 +1038,7 @@ body {
   .sidebar-uname, .sidebar-urole { display: none; }
   .sidebar-bottom { display: flex !important; flex-direction: column; gap: 0; padding: 0; border: none; position: fixed; bottom: 0; left: 0; width: 56px; background: var(--sidebar-bg); z-index: 50; }
   .sidebar-bottom .sidebar-link { justify-content: center; padding: 0.5rem 0; width: 100%; }
+  .sidebar-bottom { align-items: center; }
   /* keep user icon visible */
   .sidebar-version {
     display: block !important;
