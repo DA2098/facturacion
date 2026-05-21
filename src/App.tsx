@@ -16,6 +16,7 @@ import Facturas from './pages/Facturas.tsx';
 import Reportes from './pages/Reportes.tsx';
 import Tienda from './pages/Tienda.tsx';
 import MisFacturas from './pages/MisFacturas.tsx';
+import { SSEDebugPanel } from './components/SSEDebugPanel';
 
 // Layout protegido: requiere login
 function ProtectedLayout() {
@@ -76,6 +77,7 @@ export default function App() {
           <AppRoutes />
         </HashRouter>
       </AuthProvider>
+      <SSEDebugPanel />
     </NotificationProvider>
   );
 }
