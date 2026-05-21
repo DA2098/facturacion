@@ -144,11 +144,3 @@ function Dashboard() {
 }
 
 export default Dashboard;
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
