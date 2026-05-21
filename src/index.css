@@ -241,7 +241,7 @@ body {
 
 .profile-info-grid {
   @apply grid gap-2;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .profile-info-item {
@@ -260,6 +260,20 @@ body {
 .form-help { @apply text-xs mt-1; color: var(--text2); }
 
 .image-upload-wrapper { @apply flex items-center gap-2; }
+
+/* Ensure the native file input button/label can show on small screens */
+.image-upload-wrapper input[type="file"] {
+  min-width: 160px;
+  max-width: 100%;
+  flex: 1 1 auto;
+}
+
+/* Allow profile info values (like long emails) to wrap instead of being truncated */
+.profile-info-item span {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 
 .page-top { @apply flex items-start justify-between flex-wrap gap-3; }
 .page-title { @apply text-xl font-bold; }
