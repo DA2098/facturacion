@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
+import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
 import { getStats, getFacturas } from '../services/db.ts';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import { FileText, Users, Package, DollarSign, TrendingUp, Clock, XCircle, AlertCircle } from 'lucide-react';
@@ -25,11 +26,12 @@ const emptyStats = {
   pendientes: 0,
 };
 
-export default function Dashboard() {
+function Dashboard() {
   const { user } = useAuth();
   const nav = useNavigate();
   const [stats, setStats] = useState(emptyStats);
   const [recientes, setRecientes] = useState<Factura[]>([]);
+  useRealtimeNotifications();
 
   useEffect(() => {
     const load = async () => {
@@ -39,7 +41,6 @@ export default function Dashboard() {
     };
     void load();
   }, []);
-
   useRealtimeRefresh(() => {
     const load = async () => {
       setStats(await getStats());
@@ -48,16 +49,13 @@ export default function Dashboard() {
     };
     void load();
   }, Boolean(user));
-
   if (!user) return null;
-
   const cards = [
     { label: 'Facturas', val: stats.totalFacturas, icon: FileText, cls: 'card-blue' },
     { label: 'Clientes', val: stats.totalClientes, icon: Users, cls: 'card-green' },
     { label: 'Productos', val: stats.totalProductos, icon: Package, cls: 'card-purple' },
     { label: 'Ingresos', val: `USD/ ${stats.montoTotal.toFixed(2)}`, icon: DollarSign, cls: 'card-orange' },
   ];
-
   const estados = [
     { label: 'Emitidas', val: stats.emitidas, icon: Clock, cls: 'fill-blue' },
     { label: 'Pagadas', val: stats.pagadas, icon: TrendingUp, cls: 'fill-green' },
@@ -65,7 +63,6 @@ export default function Dashboard() {
     { label: 'Pendientes', val: stats.pendientes, icon: AlertCircle, cls: 'fill-yellow' },
   ];
   const maxE = Math.max(...estados.map(e => e.val), 1);
-
   return (
     <div className="page">
       <div className="page-top">
@@ -74,11 +71,8 @@ export default function Dashboard() {
           <p className="page-sub">Bienvenido, {user.nombre} — {user.rol === 'admin' ? 'Panel Administrador' : user.rol === 'vendedor' ? 'Panel Vendedor' : 'Panel Contador'}</p>
         </div>
       </div>
-
       <ProfilePanel title="Tu perfil" subtitle="Edita tu nombre, foto, contraseña y datos básicos desde aquí." />
-
       <AutoPagoPanel />
-
       <div className="stats-grid">
         {cards.map(c => (
           <div key={c.label} className={`stat-card ${c.cls}`}>
@@ -90,7 +84,6 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
-
       <div className="dash-row">
         <div className="dash-box">
           <h2 className="box-title">Estado de Facturas</h2>
@@ -115,7 +108,6 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-
         <div className="dash-box">
           <div className="box-top-row">
             <h2 className="box-title">Últimas Facturas</h2>
@@ -142,6 +134,16 @@ export default function Dashboard() {
                     </tr>
                   ))}
                 </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Dashboard;
               </table>
             </div>
           )}

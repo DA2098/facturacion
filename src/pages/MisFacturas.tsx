@@ -1,11 +1,13 @@
+export default MisFacturas;
 // ═══════════════════════════════════════════════════════════════
 // MIS FACTURAS — Vista del cliente para ver sus facturas
 // ═══════════════════════════════════════════════════════════════
 
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.tsx';
+import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
 import { getFacturasByCliente, getFacturaById } from '../services/db.ts';
-import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import type { Factura } from '../types/index.ts';
 import Modal from '../components/Modal.tsx';
 import { Eye, FileText, Printer, Download } from 'lucide-react';
@@ -13,8 +15,10 @@ import ProfilePanel from '../components/ProfilePanel.tsx';
 import { formatAutopagoCountdown } from '../utils/autopago.ts';
 import printFactura from '../utils/printFactura.ts';
 
-export default function MisFacturas() {
+function MisFacturas() {
+
   const { user } = useAuth();
+  useRealtimeNotifications();
   const [facturas, setFacturas] = useState<Factura[]>([]);
   const [viewOpen, setViewOpen] = useState(false);
   const [viewF, setViewF] = useState<Factura | null>(null);
@@ -158,6 +162,7 @@ export default function MisFacturas() {
             <div className="fac-actions">
               <button onClick={() => printFactura(viewF)} className="btn btn-ghost"><Printer size={14} /> Imprimir</button>
               <button onClick={() => printFactura(viewF)} className="btn btn-primary"><Download size={14} /> Descargar</button>
+export default MisFacturas;
             </div>
           </div>
         )}

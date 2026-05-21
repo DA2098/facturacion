@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { getStats, getFacturas, getUsuariosByRol } from '../services/db.ts';
+import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import { BarChart3, DollarSign, TrendingUp, FileText, Users } from 'lucide-react';
 import GraficosGanancias from '../components/GraficosGanancias.tsx';
@@ -25,6 +26,7 @@ const emptyStats = {
 export default function Reportes() {
   const [stats, setStats] = useState(emptyStats);
   const [facturas, setFacturas] = useState<Factura[]>([]);
+  useRealtimeNotifications();
 
   useEffect(() => {
     const load = async () => {

@@ -9,6 +9,7 @@ import {
   LayoutDashboard, Users, Package, FileText,
   ShoppingCart, LogOut, Receipt, BarChart3, UserCog,
 } from 'lucide-react';
+import { NotificationBell } from './NotificationBell.tsx';
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
@@ -56,12 +57,15 @@ export default function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-brand">
-        <img src="/assets/logo.png" alt="FACTS Logo" className="sidebar-logo-img" />
-        <div>
-          <h1 className="sidebar-title">FACTS</h1>
-          <p className="sidebar-sub">Facturación Electrónica</p>
+      <div className="sidebar-brand flex items-center justify-between pr-2">
+        <div className="flex items-center">
+          <img src="/assets/logo.png" alt="FACTS Logo" className="sidebar-logo-img" />
+          <div>
+            <h1 className="sidebar-title">FACTS</h1>
+            <p className="sidebar-sub">Facturación Electrónica</p>
+          </div>
         </div>
+        <NotificationBell />
       </div>
 
       <div className="sidebar-user">

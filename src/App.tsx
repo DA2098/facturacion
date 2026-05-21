@@ -4,6 +4,7 @@
 
 import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.tsx';
+import { NotificationProvider } from './context/NotificationContext.tsx';
 import Sidebar from './components/Sidebar.tsx';
 import Login from './pages/Login.tsx';
 import Registro from './pages/Registro.tsx';
@@ -54,9 +55,10 @@ function AppRoutes() {
         <Route path="/usuarios" element={<Usuarios />} />
         <Route path="/productos" element={<Productos />} />
         <Route path="/ventas" element={<Ventas />} />
-        <Route path="/facturas" element={<Facturas />} />
         <Route path="/reportes" element={<Reportes />} />
         <Route path="/tienda" element={<Tienda />} />
+        <Route path="/mis-facturas" element={<MisFacturas />} />
+        <Route path="/facturas" element={<Facturas />} />
         <Route path="/mis-facturas" element={<MisFacturas />} />
       </Route>
 
@@ -68,10 +70,12 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <HashRouter>
-        <AppRoutes />
-      </HashRouter>
-    </AuthProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <HashRouter>
+          <AppRoutes />
+        </HashRouter>
+      </AuthProvider>
+    </NotificationProvider>
   );
 }
