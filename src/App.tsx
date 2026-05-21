@@ -75,9 +75,9 @@ export default function App() {
       <AuthProvider>
         <HashRouter>
           <AppRoutes />
+          <SSEDebugPanel />
         </HashRouter>
       </AuthProvider>
-      <SSEDebugPanel />
     </NotificationProvider>
   );
 }
