@@ -169,4 +169,21 @@ router.delete('/:id', async (req, res) => {
   } catch { res.status(500).json({ error: 'Error' }); }
 });
 
+// Ampliar tiempo de pago programado para una factura (añadir minutos)
+router.post('/:id/ampliar', async (req, res) => {
+  try {
+    const minutos = Number(req.body.minutos || 0);
+    if (!minutos || isNaN(minutos)) return res.status(400).json({ error: 'minutos inválidos' });
+    const r = await pool.query(
+      `UPDATE facturas
+       SET pago_programado_para = COALESCE(pago_programado_para, CURRENT_TIMESTAMP) + ($1 || ' minutes')::interval
+       WHERE id=$2 RETURNING *`,
+      [minutos, req.params.id]
+    );
+    if (!r.rows.length) return res.status(404).json({ error: 'No encontrada' });
+    emitRealtime({ type: 'sync', entity: 'facturas', action: 'update', id: req.params.id, timestamp: new Date().toISOString(), payload: r.rows[0] });
+    res.json(r.rows[0]);
+  } catch (e: any) { console.error(e); res.status(500).json({ error: e?.message || 'Error' }); }
+});
+
 export default router;

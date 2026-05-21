@@ -428,6 +428,22 @@ export async function deleteFactura(id: string): Promise<boolean> {
   }
 }
 
+export async function extendFacturaTiempo(id: string, minutos: number): Promise<Factura | null> {
+  /**
+   * extendFacturaTiempo
+   * POST /api/facturas/:id/ampliar — Añade `minutos` al pago_programado_para de la factura.
+   */
+  try {
+    const row = await request<any>(`/api/facturas/${id}/ampliar`, {
+      method: 'POST',
+      body: JSON.stringify({ minutos }),
+    });
+    return mapFactura(row);
+  } catch {
+    return null;
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════
 // DASHBOARD / REPORTES
 // ═══════════════════════════════════════════════════════════════
