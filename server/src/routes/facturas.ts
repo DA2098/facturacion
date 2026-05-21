@@ -82,14 +82,15 @@ router.post('/', async (req, res) => {
     const config = await getAutopagoConfig();
     const autopagoActivo = canal_venta === 'tienda' && config.activo && config.minutos > 0;
     const estadoInicial = autopagoActivo ? 'pendiente' : 'emitida';
-    const pagoProgramadoPara = autopagoActivo ? `${config.minutos} minutes` : null;
+    // Pass minutes as integer (or null) and build interval in SQL safely
+    const pagoProgramadoPara = autopagoActivo ? Number(config.minutos || 0) : null;
     const fac = await client.query(
       `INSERT INTO facturas (
         numero,cliente_id,vendedor_id,subtotal,impuesto_total,total,estado,metodo_pago,notas,canal_venta,pago_programado_para
        )
-       VALUES (
+        VALUES (
         $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
-        CASE WHEN $11 IS NULL THEN NULL ELSE CURRENT_TIMESTAMP + ($11 || ' minutes')::interval END
+        CASE WHEN $11 IS NULL THEN NULL ELSE CURRENT_TIMESTAMP + ($11::text || ' minutes')::interval END
        ) RETURNING *`,
       [numero, cliente_id, vendedor_id, subtotal, imp, subtotal+imp, estadoInicial, metodo_pago||'Efectivo', notas||'', canal_venta, pagoProgramadoPara]
     );
