@@ -10,6 +10,7 @@
 import { Router } from 'express';
 import pool from '../db';
 import { emitRealtime } from '../realtime';
+import { crearNotificacion } from '../notificaciones';
 import { getAutopagoConfig, scheduleFacturaAutopago, sweepAutopagoFacturas } from '../autopago';
 
 const router = Router();
@@ -117,6 +118,22 @@ router.post('/', async (req, res) => {
       timestamp: new Date().toISOString(),
       payload: fac.rows[0],
     });
+    // Notificación para cliente
+    await crearNotificacion({
+      usuario_id: fac.rows[0].cliente_id,
+      tipo: 'factura_emitida',
+      titulo: 'Factura emitida',
+      mensaje: `Tu factura #${fac.rows[0].numero} ha sido emitida.`,
+      data: { factura_id: fac.rows[0].id }
+    });
+    // Notificación para vendedor
+    await crearNotificacion({
+      usuario_id: fac.rows[0].vendedor_id,
+      tipo: 'factura_emitida',
+      titulo: 'Factura emitida',
+      mensaje: `Emitiste la factura #${fac.rows[0].numero} al cliente.`,
+      data: { factura_id: fac.rows[0].id }
+    });
     res.status(201).json(fac.rows[0]);
   } catch (e: any) {
     await client.query('ROLLBACK');
@@ -149,6 +166,23 @@ router.put('/:id', async (req, res) => {
       timestamp: new Date().toISOString(),
       payload: r.rows[0],
     });
+    // Si la factura fue marcada como pagada, notificar a cliente y vendedor
+    if (estado === 'pagada') {
+      await crearNotificacion({
+        usuario_id: r.rows[0].cliente_id,
+        tipo: 'factura_pagada',
+        titulo: 'Factura pagada',
+        mensaje: `Tu factura #${r.rows[0].numero} ha sido pagada.`,
+        data: { factura_id: r.rows[0].id }
+      });
+      await crearNotificacion({
+        usuario_id: r.rows[0].vendedor_id,
+        tipo: 'factura_pagada',
+        titulo: 'Factura pagada',
+        mensaje: `La factura #${r.rows[0].numero} fue marcada como pagada.`,
+        data: { factura_id: r.rows[0].id }
+      });
+    }
     res.json(r.rows[0]);
   } catch { res.status(500).json({ error: 'Error' }); }
 });

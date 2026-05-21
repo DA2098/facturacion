@@ -232,9 +232,6 @@ CREATE TRIGGER trg_facturas_timestamp
     BEFORE UPDATE ON facturas
     FOR EACH ROW EXECUTE FUNCTION fn_update_timestamp();
 
--- ═══════════════════════════════════════════════════════════════
--- TRIGGER: descontar stock al crear detalle de factura
--- ═══════════════════════════════════════════════════════════════
 
 CREATE OR REPLACE FUNCTION fn_descontar_stock()
 RETURNS TRIGGER AS $$
@@ -248,6 +245,33 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_descontar_stock
     AFTER INSERT ON factura_detalles
+-- ═══════════════════════════════════════════════════════════════
+-- TABLA: notificaciones
+-- ═══════════════════════════════════════════════════════════════
+-- Notificaciones individuales para usuarios (admin, cliente, vendedor, contador)
+-- Tipos: producto_agregado, factura_emitida, factura_pagada, etc.
+
+CREATE TABLE notificaciones (
+     id              UUID           PRIMARY KEY DEFAULT uuid_generate_v4(),
+     usuario_id      UUID           NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+     tipo            VARCHAR(50)    NOT NULL, -- Ej: producto_agregado, factura_emitida, factura_pagada
+     titulo          VARCHAR(200)   NOT NULL,
+     mensaje         TEXT           NOT NULL,
+     data            JSONB          DEFAULT '{}'::jsonb, -- Info adicional (opcional)
+     leida           BOOLEAN        NOT NULL DEFAULT FALSE,
+     eliminada       BOOLEAN        NOT NULL DEFAULT FALSE,
+     created_at      TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_notificaciones_usuario ON notificaciones (usuario_id);
+CREATE INDEX idx_notificaciones_tipo    ON notificaciones (tipo);
+CREATE INDEX idx_notificaciones_leida   ON notificaciones (leida);
+
+COMMENT ON TABLE  notificaciones IS 'Notificaciones individuales para usuarios, con tipos y soporte de lectura/borrado';
+COMMENT ON COLUMN notificaciones.tipo IS 'Tipo de evento: producto_agregado, factura_emitida, factura_pagada, etc';
+COMMENT ON COLUMN notificaciones.data IS 'Datos adicionales en formato JSON (opcional)';
+COMMENT ON COLUMN notificaciones.leida IS 'TRUE si el usuario ya vio la notificación';
+COMMENT ON COLUMN notificaciones.eliminada IS 'TRUE si el usuario eliminó la notificación (soft delete)';
     FOR EACH ROW EXECUTE FUNCTION fn_descontar_stock();
 
 -- ═══════════════════════════════════════════════════════════════

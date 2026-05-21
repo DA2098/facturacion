@@ -9,6 +9,7 @@
 import { Router } from 'express';
 import pool from '../db';
 import { emitRealtime } from '../realtime';
+import { crearNotificacion } from '../notificaciones';
 
 const router = Router();
 
@@ -31,7 +32,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     // Crear nuevo producto — parámetros esperados en el body
-    const { codigo, nombre, descripcion, image_url, precio, impuesto, stock, categoria } = req.body;
+    const { codigo, nombre, descripcion, image_url, precio, impuesto, stock, categoria, usuario_id } = req.body;
     if (!codigo || !nombre) return res.status(400).json({ error: 'Código y nombre obligatorios' });
     const r = await pool.query(
       `INSERT INTO productos (codigo,nombre,descripcion,image_url,precio,impuesto,stock,categoria)
@@ -46,6 +47,16 @@ router.post('/', async (req, res) => {
       timestamp: new Date().toISOString(),
       payload: r.rows[0],
     });
+    // Crear notificación para el admin que agregó el producto
+    if (usuario_id) {
+      await crearNotificacion({
+        usuario_id,
+        tipo: 'producto_agregado',
+        titulo: 'Producto agregado',
+        mensaje: `Agregaste el producto ${nombre} (${codigo}) al catálogo.`,
+        data: { producto_id: r.rows[0].id }
+      });
+    }
     res.status(201).json(r.rows[0]);
   } catch (e: any) {
     // 23505 => violación de unicidad (código duplicado)
