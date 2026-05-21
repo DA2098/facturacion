@@ -44,8 +44,16 @@ export default function Productos() {
     if (editId) {
       await updateProducto(editId, form);
     } else {
+      // Evitar enviar al servidor si el código ya existe (409)
+      if (all.some(p => p.codigo === form.codigo)) {
+        alert('El código ya existe en el catálogo — usa otro código.');
+        return;
+      }
       const payload = { ...form, stock: form.stock > 0 ? form.stock : 1 };
-      await createProducto(payload as Producto);
+      const created = await createProducto(payload as Producto);
+      if (!created) {
+        alert('Error creando el producto en el servidor. Comprueba la consola o inténtalo de nuevo.');
+      }
     }
     setModalOpen(false); await load();
   }
