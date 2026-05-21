@@ -47,30 +47,21 @@ router.post('/', async (req, res) => {
       timestamp: new Date().toISOString(),
       payload: r.rows[0],
     });
-    // Crear notificación para el admin que agregó el producto
-    if (usuario_id) {
-      await crearNotificacion({
-        usuario_id,
-        tipo: 'producto_agregado',
-        titulo: 'Producto agregado',
-        mensaje: `Agregaste el producto ${nombre} (${codigo}) al catálogo.`,
-        data: { producto_id: r.rows[0].id }
-      });
-    }
-    // Notificar también a todos los administradores activos (excepto el creador)
+    // Crear notificaciones para todos los usuarios activos (incluye creador)
     try {
-      const admins = (await pool.query("SELECT id FROM usuarios WHERE rol='admin' AND activo = true")).rows;
-      for (const a of admins) {
+      const users = (await pool.query("SELECT id FROM usuarios WHERE activo = true")).rows;
+      for (const u of users) {
+        const isCreator = String(u.id) === String(usuario_id);
         await crearNotificacion({
-          usuario_id: a.id,
+          usuario_id: u.id,
           tipo: 'producto_agregado',
-          titulo: 'Nuevo producto',
-          mensaje: `Se agregó el producto ${nombre} (${codigo}) al catálogo.`,
+          titulo: isCreator ? 'Producto agregado' : 'Nuevo producto',
+          mensaje: isCreator ? `Agregaste el producto ${nombre} (${codigo}) al catálogo.` : `Se agregó el producto ${nombre} (${codigo}) al catálogo.`,
           data: { producto_id: r.rows[0].id }
         });
       }
     } catch (e) {
-      console.error('Error notifying admins about new product', e);
+      console.error('Error notifying users about new product', e);
     }
     res.status(201).json(r.rows[0]);
   } catch (e: any) {
