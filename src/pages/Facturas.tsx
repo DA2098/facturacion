@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { Search, Eye, Trash2, FileText, CheckCircle, XCircle, Printer } from 'lucide-react';
-import { getFacturas, updateFactura, deleteFactura, getFacturasByVendedor, getFacturaById } from '../services/db.ts';
+import { getFacturas, updateFactura, deleteFactura, getFacturasByVendedor, getFacturaById, getAutopagoConfig, updateAutopagoConfig } from '../services/db.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useRealtimeRefresh } from '../hooks/useRealtimeRefresh.ts';
 import type { Factura } from '../types/index.ts';
@@ -22,6 +22,8 @@ export default function Facturas() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [delId, setDelId] = useState('');
   const [now, setNow] = useState(Date.now());
+  const [autopago, setAutopago] = useState<{ activo: boolean; minutos: number } | null>(null);
+  const [savingAutopago, setSavingAutopago] = useState(false);
 
   async function load() {
     if (!user) return;
@@ -29,6 +31,18 @@ export default function Facturas() {
     else { setAll(await getFacturas()); }
   }
   useEffect(() => { void load(); }, [user]);
+  useEffect(() => {
+    if (user?.rol !== 'admin') return;
+    const loadConfig = async () => {
+      try {
+        const cfg = await getAutopagoConfig();
+        setAutopago(cfg);
+      } catch (err) {
+        console.error('Error loading autopago config', err);
+      }
+    };
+    void loadConfig();
+  }, [user]);
   useEffect(() => {
     // If admin or vendedor we need a smooth realtime countdown (1s), otherwise coarse refresh
     const intervalMs = user && (user.rol === 'admin' || user.rol === 'vendedor') ? 1000 : 30000;
@@ -59,6 +73,20 @@ export default function Facturas() {
     setViewF(full || f);
     setViewOpen(true);
   }
+  async function saveAutopago() {
+    if (!autopago) return;
+    setSavingAutopago(true);
+    try {
+      const updated = await updateAutopagoConfig({ activo: Boolean(autopago.activo), minutos: Number(autopago.minutos) });
+      if (updated) setAutopago(updated);
+      alert('Configuración de autopago guardada');
+    } catch (err) {
+      console.error(err);
+      alert('Error guardando configuración');
+    } finally {
+      setSavingAutopago(false);
+    }
+  }
   async function marcar(id: string, estado: 'pagada' | 'anulada') {
     await updateFactura(id, { estado });
     await load();
@@ -82,6 +110,24 @@ export default function Facturas() {
             </button>
           ))}
         </div>
+        {user?.rol === 'admin' && (
+          <div className="autopago-config">
+            <label className="autopago-label">Autopago:</label>
+            <select value={String(autopago?.minutos ?? 5)} onChange={e => setAutopago(prev => ({ ...(prev||{activo:true,minutos:5}), minutos: Number(e.target.value) }))}>
+              <option value={5}>5 minutos</option>
+              <option value={1440}>24 horas</option>
+              <option value={2880}>2 días</option>
+              <option value={10080}>1 semana</option>
+              <option value={20160}>2 semanas</option>
+              <option value={259200}>6 meses</option>
+              <option value={518400}>12 meses</option>
+            </select>
+            <label style={{ marginLeft: 12 }}>
+              <input type="checkbox" checked={!!autopago?.activo} onChange={e => setAutopago(prev => ({ ...(prev||{minutos:5}), activo: e.target.checked }))} /> Activo
+            </label>
+            <button className="btn btn-sm" style={{ marginLeft: 8 }} onClick={() => void saveAutopago()} disabled={savingAutopago}>Guardar</button>
+          </div>
+        )}
       </div>
 
       {filtered.length === 0 ? (
