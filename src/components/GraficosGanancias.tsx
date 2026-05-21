@@ -16,23 +16,40 @@ interface PeriodoData {
 export default function GraficosGanancias() {
   const [data, setData] = useState<PeriodoData[]>([]);
   const [loading, setLoading] = useState(true);
-async function loadData() {
+  const loadData = async () => {
+    const API = (import.meta as any).env?.VITE_API_URL || 'https://facturacion-api-w7ai.onrender.com/api';
     try {
-      const API = (import.meta as any).env?.VITE_API_URL || 'https://facturacion-api-w7ai.onrender.com/api';
       const res = await fetch(`${API}/api/dashboard/ganancias-periodo`);
-      if (res.ok) {
-        const json = await res.json();
-        setData([
-          json.dia,
-          json.semana,
-          json.mes,
-          json.anio,
-        ]);
+      if (!res.ok) {
+        console.error('Respuesta no OK al solicitar ganancias:', res.status);
+        setData([]);
+        return;
       }
+
+      const json = await res.json();
+
+      const normalize = (src: any, label: string): PeriodoData => ({
+        periodo: src?.periodo || label,
+        ganancia: Number(src?.ganancia ?? src?.total_pagado ?? 0) || 0,
+        perdida: Number(src?.perdida ?? src?.total_anulado ?? 0) || 0,
+        advertencia: Number(src?.advertencia ?? src?.pendiente ?? 0) || 0,
+      });
+
+      const entries: PeriodoData[] = [
+        normalize(json?.dia, 'Día'),
+        normalize(json?.semana, 'Semana'),
+        normalize(json?.mes, 'Mes'),
+        normalize(json?.anio, 'Año'),
+      ];
+
+      setData(entries);
     } catch (err) {
       console.error('Error cargando ganancias:', err);
+      setData([]);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     const load = async () => {
