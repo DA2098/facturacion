@@ -116,7 +116,7 @@ export default function Ventas() {
             <div className="venta-add-row">
               <select value={prodSel} onChange={e => setProdSel(e.target.value)} className="form-input venta-prod-sel">
                 <option value="">-- Producto --</option>
-                {productos.map(p => <option key={p.id} value={p.id}>{p.codigo} — {p.nombre} (S/{p.precio.toFixed(2)}) Stock:{p.stock}</option>)}
+                {productos.map(p => <option key={p.id} value={p.id}>{p.codigo} — {p.nombre} (USD {p.precio.toFixed(2)}) Stock:{p.stock}</option>)}
               </select>
               <input type="number" min="1" value={cant} onChange={e => setCant(parseInt(e.target.value) || 1)} className="form-input venta-cant" placeholder="Cant" />
               <button onClick={agregar} className="btn btn-primary btn-sm"><Plus size={14} /> Agregar</button>
@@ -132,9 +132,9 @@ export default function Ventas() {
                     <tr key={d.id}>
                       <td><span className="mono">{d.producto_codigo}</span> {d.producto_nombre}</td>
                       <td>{d.cantidad}</td>
-                      <td>S/ {d.precio_unitario.toFixed(2)}</td>
+                      <td>USD {d.precio_unitario.toFixed(2)}</td>
                       <td>{d.impuesto}%</td>
-                      <td>S/ {d.subtotal.toFixed(2)}</td>
+                      <td>USD {d.subtotal.toFixed(2)}</td>
                       <td><button onClick={() => quitar(d.id)} className="act-btn act-del"><Trash2 size={14} /></button></td>
                     </tr>
                   ))}
@@ -161,9 +161,9 @@ export default function Ventas() {
         <div className="venta-right">
           <div className="venta-totales">
             <h3 className="venta-totales-title">Resumen</h3>
-            <div className="venta-total-row"><span>Subtotal</span><span>S/ {subtotal.toFixed(2)}</span></div>
-            <div className="venta-total-row"><span>Impuesto</span><span>S/ {impTotal.toFixed(2)}</span></div>
-            <div className="venta-total-row venta-total-final"><span>TOTAL</span><span>S/ {total.toFixed(2)}</span></div>
+            <div className="venta-total-row"><span>Subtotal</span><span>USD {subtotal.toFixed(2)}</span></div>
+            <div className="venta-total-row"><span>Impuesto</span><span>USD {impTotal.toFixed(2)}</span></div>
+            <div className="venta-total-row venta-total-final"><span>TOTAL</span><span>USD {total.toFixed(2)}</span></div>
             <div className="venta-total-row venta-items"><span>Ítems</span><span>{detalles.length}</span></div>
               <button onClick={() => void emitir()} disabled={!clienteId || detalles.length === 0} className="btn btn-success btn-full venta-emit-btn">
               <ShoppingCart size={18} /> Emitir Factura

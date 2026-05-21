@@ -137,7 +137,7 @@ export default function Dashboard() {
                     <tr key={f.id}>
                       <td className="mono">{f.numero}</td>
                       <td>{f.cliente_nombre}</td>
-                      <td>S/ {f.total.toFixed(2)}</td>
+                      <td>USD {f.total.toFixed(2)}</td>
                       <td><span className={`badge badge-${f.estado}`}>{f.estado}</span></td>
                     </tr>
                   ))}
