@@ -11,6 +11,7 @@ import Modal from '../components/Modal.tsx';
 import { Eye, FileText, Printer, Download } from 'lucide-react';
 import ProfilePanel from '../components/ProfilePanel.tsx';
 import { formatAutopagoCountdown } from '../utils/autopago.ts';
+import printFactura from '../utils/printFactura.ts';
 
 export default function MisFacturas() {
   const { user } = useAuth();
@@ -142,8 +143,8 @@ export default function MisFacturas() {
             </div>
 
             <div className="fac-actions">
-              <button onClick={() => window.print()} className="btn btn-ghost"><Printer size={14} /> Imprimir</button>
-              <button onClick={() => window.print()} className="btn btn-primary"><Download size={14} /> Descargar</button>
+              <button onClick={() => printFactura(viewF)} className="btn btn-ghost"><Printer size={14} /> Imprimir</button>
+              <button onClick={() => printFactura(viewF)} className="btn btn-primary"><Download size={14} /> Descargar</button>
             </div>
           </div>
         )}
